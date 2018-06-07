@@ -14,10 +14,10 @@ public class Server extends Thread {
     private int port;
 
     private static UsersList usersList = new UsersList();
-    private static BlockingQueue<String> requstList = new ArrayBlockingQueue<>(10);
+    private static BlockingQueue<String> requestList = new ArrayBlockingQueue<>(10);
 
-    public synchronized static BlockingQueue<String> getRequstList() {
-        return requstList;
+    public synchronized static BlockingQueue<String> getRequestList() {
+        return requestList;
     }
 
     public synchronized static UsersList getUserList() {

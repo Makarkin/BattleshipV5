@@ -38,7 +38,7 @@ public class ServerClientSession extends Thread {
             this.broadcast(Server.getUserList().getClientsList(), this.longMessage);
 
             this.request = ((LongMessage) inputStream.readObject()).getResponse();
-            Server.getRequstList().add(this.request);
+            Server.getRequestList().add(this.request);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

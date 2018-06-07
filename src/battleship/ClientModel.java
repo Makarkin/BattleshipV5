@@ -119,6 +119,7 @@ public class ClientModel extends Thread {
 
     void transferResultOfEnemyFire(String result) throws IOException {
         outputStream = new ObjectOutputStream(this.socket.getOutputStream());
+        result = result + " " + opponentName;
         outputStream.writeObject(result);
         outputStream.flush();
         outputStream.reset();
