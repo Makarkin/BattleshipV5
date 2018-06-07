@@ -16,6 +16,7 @@ public class ClientModel extends Thread {
     private Socket socket;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
+    private String opponentName;
 
     ClientModel(Controller controller) throws IOException {
         InetAddress address = InetAddress.getByName(controller.getIntrServerAddress());
@@ -45,7 +46,8 @@ public class ClientModel extends Thread {
                         outputStream.writeObject(new LongMessage(request));
                     }
                 } else {
-                    mes.getResponse();
+                    opponentName = mes.getResponse();
+                    controller.getMainView().getEnemyLabel().setText(opponentName);
                     //решение под ответ на реквест
                 }
             }
@@ -78,6 +80,7 @@ public class ClientModel extends Thread {
     }
 
     void transferFire(String fireCoordinates) throws IOException {
+        fireCoordinates = fireCoordinates + " " + opponentName;
         outputStream = new ObjectOutputStream(this.socket.getOutputStream());
         outputStream.writeObject(fireCoordinates);
         outputStream.flush();
