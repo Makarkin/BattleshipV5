@@ -30,6 +30,10 @@ public class LongMessage implements Serializable {
         this.nickname = nickname;
     }
 
+    public LongMessage(String response) {
+        this.response = response;
+    }
+
     public LongMessage(String nickname, Board board) {
         this.nickname = nickname;
         this.board = board;

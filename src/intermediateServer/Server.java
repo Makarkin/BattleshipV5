@@ -16,13 +16,16 @@ public class Server extends Thread {
     private static UsersList usersList = new UsersList();
     private static BlockingQueue<String> requstList = new ArrayBlockingQueue<>(10);
 
-
-    public Server(int port) {
-        this.port = port;
+    public synchronized static BlockingQueue<String> getRequstList() {
+        return requstList;
     }
 
     public synchronized static UsersList getUserList() {
         return usersList;
+    }
+
+    public Server(int port) {
+        this.port = port;
     }
 
     @Override

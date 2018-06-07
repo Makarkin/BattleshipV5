@@ -42,7 +42,7 @@ public class ClientModel extends Thread {
                     String request = new String();
                     chooseUser(users, request);
                     if (request != null) {
-                        outputStream.writeObject(request);
+                        outputStream.writeObject(new LongMessage(request));
                     }
                 } else {
                     mes.getResponse();

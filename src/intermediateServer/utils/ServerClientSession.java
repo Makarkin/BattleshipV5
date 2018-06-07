@@ -17,6 +17,7 @@ public class ServerClientSession extends Thread {
     private String nickName;
     private Board board;
     private LongMessage longMessage;
+    private String request;
 
     public ServerClientSession(final Socket socket) {
         this.socket = socket;
@@ -30,11 +31,14 @@ public class ServerClientSession extends Thread {
             this.longMessage = (LongMessage) inputStream.readObject();
             this.nickName = this.longMessage.getNickname();
             this.board = this.longMessage.getBoard();
+
             final ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
             Server.getUserList().addUser(nickName, socket, outputStream, inputStream, board);
             this.longMessage.setOnlineUsers(Server.getUserList().getUsersName());
             this.broadcast(Server.getUserList().getClientsList(), this.longMessage);
 
+            this.request = ((LongMessage) inputStream.readObject()).getResponse();
+            Server.getRequstList().add(this.request);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
