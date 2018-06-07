@@ -18,6 +18,7 @@ import static javafx.scene.input.MouseButton.PRIMARY;
 import static javafx.scene.input.MouseButton.SECONDARY;
 import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.GREEN;
+import static javafx.scene.paint.Color.RED;
 
 public class Controller {
 
@@ -38,31 +39,76 @@ public class Controller {
     private Board yourBoard = new Board();
     static boolean yourTurn = false;
 
+    public static void setYourTurn(boolean yourTurn) {
+        Controller.yourTurn = yourTurn;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public String getIntrServerAddress() {
+        return intrServerAddress;
+    }
+
+    public MainView getMainView() {
+        return mainView;
+    }
+
+    public Board getYourBoard() {
+        return yourBoard;
+    }
+
     Controller(String intrServerAddres, int port, MainView mainView) {
         this.port = port;
         this.intrServerAddress = intrServerAddres;
         this.mainView = mainView;
     }
 
-    void runToServer(ActionEvent actionEvent) throws IOException {
+    void start(ActionEvent actionEvent) throws IOException {
         if (numberOfShipsOnBoard == 10) {
         System.out.println("Start");
-        this.clientModel = new ClientModel(intrServerAddress, port, mainView.getYouLabel().getText(), yourBoard);
+        this.clientModel = new ClientModel(this);
         this.clientModel.start();
         yourTurn = true;
         }
     }
 
-    void makeShot(MouseEvent mouseEvent) throws IOException {
+    void makeShot(MouseEvent mouseEvent) throws IOException, ClassNotFoundException {
         if (yourTurn) {
+            yourTurn = false;
             Rectangle rectangle = (Rectangle) mouseEvent.getSource();
             Integer i = GridPane.getRowIndex(rectangle);
             Integer j = GridPane.getColumnIndex(rectangle);
             rectangle.setFill(BLACK);
-            String fireCoordinates = i + " " + j;
+            String fireCoordinates = "fire" + " " + i + " " + j;
             clientModel.transferFire(fireCoordinates);
-            yourTurn = false;
+            boolean result = clientModel.acceptResultOfYourFire();
+            if (result) {
+                rectangle.setFill(RED);
+                enemySumOfDecks--;
+                if (enemySumOfDecks == 0) {
+                    mainView.getGameMessage().setText("You win!");
+                    clientModel.transferVictoryMessage();
+                }
+            }
+
+            getShot();
+            yourTurn = true;
         }
+    }
+
+    private void getShot() throws IOException, ClassNotFoundException {
+        int[] result = clientModel.acceptFire();
+        boolean enemyResult;
+        if (yourBoard.getIndexCell(result[0], result[1]).isWithShip()) {
+            enemyResult = true;
+        } else {
+            enemyResult = false;
+        }
+
+        String transResult = "result " + enemyResult;
+        clientModel.transferResultOfEnemyFire(transResult);
     }
 
     void placeShip(MouseEvent mouseEvent) {
@@ -80,7 +126,7 @@ public class Controller {
 
         Cell probeCell = yourBoard.getIndexCell(i, j);
 
-        if (mouseButton == PRIMARY) {//vertical placing
+        if (mouseButton == PRIMARY) {
 
             if (counterList.contains(counter) && !hasShipsNear(i, j, yourBoard)) {
                 probeCell.setModifable(true);
@@ -89,14 +135,7 @@ public class Controller {
             if (!probeCell.isWithShip() && probeCell.isModifable() && counter < 20
                     && checkVerticalShipPlaceConstraint(i, j, predI, predJ)
                     && !probeCell.isFrozen()) {
-                rectangle.setFill(GREEN);
-                counterOfDeck++;
-                counter++;
-                Cell cell = new Cell();
-                cell.setWithShip(true);
-                cell.setModifable(false);
-                yourBoard.setIndexCell(cell, i, j);
-                itShouldFrozen.add(new IndexVault(i, j));
+                addCellWithShip(rectangle, i, j);
                 if (counterOfDeck < numberOfDeckList.get(numberOfShipsOnBoard)) {
                     if (i > 0 && i < 9) {
                         if (!yourBoard.getIndexCell(i - 1, j).isFrozen()) yourBoard.getIndexCell(i - 1, j).setModifable(true);
@@ -109,14 +148,10 @@ public class Controller {
                         if (!yourBoard.getIndexCell(i - 1, j).isFrozen()) yourBoard.getIndexCell(i - 1, j).setModifable(true);
                     }
                 } else {
-                    numberOfShipsOnBoard++;
-                    counterOfDeck = 0;
-                    freezeCell(itShouldFrozen, yourBoard);
-                    itShouldFrozen.clear();
-                    mainView.getGameMessage().setText("You have left to place " + (10 - numberOfShipsOnBoard) + " ships");
+                    afterOneShipPlace();
                 }
             }
-        } else if (mouseButton == SECONDARY) {//horizontal placing
+        } else if (mouseButton == SECONDARY) {
 
             if (counterList.contains(counter) && !hasShipsNear(i, j, yourBoard)) {
                 probeCell.setModifable(true);
@@ -125,14 +160,7 @@ public class Controller {
             if (!probeCell.isWithShip() && probeCell.isModifable() && counter < 20
                     && checkHorizontalShipPlaceConstraint(i,j, predI, predJ)
                     && !probeCell.isFrozen()) {
-                rectangle.setFill(GREEN);
-                counterOfDeck++;
-                counter++;
-                Cell cell = new Cell();
-                cell.setWithShip(true);
-                cell.setModifable(false);
-                yourBoard.setIndexCell(cell, i, j);
-                itShouldFrozen.add(new IndexVault(i, j));
+                addCellWithShip(rectangle, i, j);
                 if (counterOfDeck < numberOfDeckList.get(numberOfShipsOnBoard)) {
                     if (j > 0 && j < 9) {
                         if (!yourBoard.getIndexCell(i, j - 1).isFrozen()) yourBoard.getIndexCell(i, j - 1).setModifable(true);
@@ -145,14 +173,29 @@ public class Controller {
                         if (!yourBoard.getIndexCell(i, j - 1).isFrozen()) yourBoard.getIndexCell(i, j - 1).setModifable(true);
                     }
                 } else {
-                    numberOfShipsOnBoard++;
-                    counterOfDeck = 0;
-                    freezeCell(itShouldFrozen, yourBoard);
-                    itShouldFrozen.clear();
-                    mainView.getGameMessage().setText("You have left to place " + (10 - numberOfShipsOnBoard) + " ships");
+                    afterOneShipPlace();
                 }
             }
         }
+    }
+
+    private void addCellWithShip(Rectangle rectangle, int i, int j) {
+        rectangle.setFill(GREEN);
+        counterOfDeck++;
+        counter++;
+        Cell cell = new Cell();
+        cell.setWithShip(true);
+        cell.setModifable(false);
+        yourBoard.setIndexCell(cell, i, j);
+        itShouldFrozen.add(new IndexVault(i, j));
+    }
+
+    private void afterOneShipPlace() {
+        numberOfShipsOnBoard++;
+        counterOfDeck = 0;
+        freezeCell(itShouldFrozen, yourBoard);
+        itShouldFrozen.clear();
+        mainView.getGameMessage().setText("You have left to place " + (10 - numberOfShipsOnBoard) + " ships");
     }
 
     private static boolean checkVerticalShipPlaceConstraint(int rowCounter, int columnCounter, Integer predI, Integer predJ) {

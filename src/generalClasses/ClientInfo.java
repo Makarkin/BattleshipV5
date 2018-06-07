@@ -12,7 +12,12 @@ public class ClientInfo implements Serializable {
     private Socket socket;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
-    Board board;
+    private Board board;
+    private Boolean isBusy = false;
+
+    public Boolean getBusy() {
+        return isBusy;
+    }
 
     public ClientInfo(Socket socket){
         this.socket = socket;

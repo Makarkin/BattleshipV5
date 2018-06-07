@@ -13,17 +13,15 @@ import java.util.Scanner;
 
 public class ClientModel extends Thread {
 
+    private Controller controller;
     private Socket socket;
-    private String nickname;
-    private Board board;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
 
-    ClientModel(String inetAddressIntrServer, int portIntrServer, String nickname, Board board) throws IOException {
-        InetAddress address = InetAddress.getByName(inetAddressIntrServer);
-        this.socket = new Socket(address, portIntrServer);
-        this.nickname = nickname;
-        this.board = board;
+    ClientModel(Controller controller) throws IOException {
+        InetAddress address = InetAddress.getByName(controller.getIntrServerAddress());
+        this.socket = new Socket(address, controller.getPort());
+        this.controller = controller;
     }
 
     @Override
@@ -31,7 +29,7 @@ public class ClientModel extends Thread {
         Controller.yourTurn = true;
         boolean flag = true;
         try {
-            Message message = new Message(this.nickname, this.board);
+            Message message = new Message(controller.getMainView().getYouLabel().getText(), controller.getYourBoard());
             outputStream = new ObjectOutputStream(this.socket.getOutputStream());
             outputStream.writeObject(message);
 
@@ -54,6 +52,15 @@ public class ClientModel extends Thread {
     void transferFire(String fireCoordinates) throws IOException {
         outputStream = new ObjectOutputStream(this.socket.getOutputStream());
         outputStream.writeObject(fireCoordinates);
+        outputStream.flush();
+        outputStream.reset();
+    }
+
+    Boolean acceptResultOfYourFire() throws IOException, ClassNotFoundException {
+        inputStream = new ObjectInputStream(this.socket.getInputStream());
+        Boolean result = (Boolean) inputStream.readObject();
+        inputStream.reset();
+        return result;
     }
 
     private void sendRequestToPlayer(String[] users) {
@@ -66,9 +73,28 @@ public class ClientModel extends Thread {
     private void showUsers(String[] users) {
         Date date = new Date();
         int i = 0;
+        String[] info = new String[2];
         System.out.println(date.toString());
         for (String user : users) {
-            System.out.println(i + " " + user);
+            info = user.split(" ");
+            System.out.println("Number of player: " + i + "; Name: " + info[0] +"; Is busy: " + info[1]);
         }
+    }
+
+    public void transferVictoryMessage() {
+    }
+
+    public int[] acceptFire() throws IOException, ClassNotFoundException {
+        inputStream = new ObjectInputStream(this.socket.getInputStream());
+        int[] result = (int[]) inputStream.readObject();
+        inputStream.reset();
+        return result;
+    }
+
+    public void transferResultOfEnemyFire(String result) throws IOException {
+        outputStream = new ObjectOutputStream(this.socket.getOutputStream());
+        outputStream.writeObject(result);
+        outputStream.flush();
+        outputStream.reset();
     }
 }

@@ -40,11 +40,11 @@ public class UsersList {
 
     public String[] getUsersName() {
         ArrayList<String> arrayList = new ArrayList<>();
+        String result = new String();
         Set<String> set = onlineUsers.keySet();
         for (String s : set) {
-            String value = s + " " + onlineUsers.get(s).getSocket().getInetAddress().toString() +
-                    " " + onlineUsers.get(s).getSocket().getPort();
-            arrayList.add(value);
+            result = s + " " + onlineUsers.get(s).getBusy();
+            arrayList.add(result);
         }
 
         String[] resultArray = new String[arrayList.size()];
@@ -61,7 +61,6 @@ public class UsersList {
         String s = "";
         for (Map.Entry<String, ClientInfo> m : this.onlineUsers.entrySet()) {
             clientsList.add(m.getValue());
-            //System.out.println(m.getKey());
             s = s + m.getKey();
         }
 

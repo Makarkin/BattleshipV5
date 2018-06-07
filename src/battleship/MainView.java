@@ -1,15 +1,11 @@
 package battleship;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -62,6 +58,8 @@ private void setActionsOnEnemyBoard(GridPane gridPane) {
                 controller.makeShot(e);
             } catch (IOException e1) {
                 e1.printStackTrace();
+            } catch (ClassNotFoundException e1) {
+                e1.printStackTrace();
             }
         });
     }
@@ -76,7 +74,7 @@ private void setActionsOnEnemyBoard(GridPane gridPane) {
     private void setActionsOnYourButton(Button button) {
         button.setOnAction(event -> {
             try {
-                controller.runToServer(event);
+                controller.start(event);
             } catch (IOException e) {
                 e.printStackTrace();
             }
