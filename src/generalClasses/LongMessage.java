@@ -8,10 +8,10 @@ public class LongMessage implements Serializable {
     private String nickname;
     private String[] onlineUsers;
     private Board board;
-    private String response;
+    private String report;
 
-    public String getResponse() {
-        return response;
+    public String getReport() {
+        return report;
     }
 
     public String[] getOnlineUsers() {
@@ -30,8 +30,8 @@ public class LongMessage implements Serializable {
         this.nickname = nickname;
     }
 
-    public LongMessage(String response) {
-        this.response = response;
+    public LongMessage(String report) {
+        this.report = report;
     }
 
     public LongMessage(String nickname, Board board) {

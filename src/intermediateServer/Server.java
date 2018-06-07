@@ -15,7 +15,7 @@ public class Server extends Thread {
 
     private static UsersList usersList = new UsersList();
     private static BlockingQueue<String> requestList = new ArrayBlockingQueue<>(10);
-
+//написать обработчик запросов
     public synchronized static BlockingQueue<String> getRequestList() {
         return requestList;
     }
@@ -38,6 +38,9 @@ public class Server extends Thread {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("New client connected to server");
                 ServerClientSession clientSession = new ServerClientSession(clientSocket);
+                for (int i = 0; i < requestList.size(); i++) {
+                    //написать обработчик запросов по ключевым словам
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

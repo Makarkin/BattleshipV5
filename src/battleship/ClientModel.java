@@ -46,7 +46,7 @@ public class ClientModel extends Thread {
                         outputStream.writeObject(new LongMessage(request));
                     }
                 } else {
-                    opponentName = mes.getResponse();
+                    opponentName = mes.getReport();
                     controller.getMainView().getEnemyLabel().setText(opponentName);
                     //решение под ответ на реквест
                 }
