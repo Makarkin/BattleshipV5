@@ -41,29 +41,29 @@ public class MainView extends Application {
     }
 
     private void addRectangle(GridPane gridPane) {
-    gridPane.setGridLinesVisible(true);
-    gridPane.setHgap(1);
-    gridPane.setVgap(1);
-    for (int i = 0; i < 9; i++) {
-        for (int j = 0; j < 9; j++) {
-            gridPane.add(new Rectangle(30,30,Color.LIGHTGREY), i, j);
+        gridPane.setGridLinesVisible(true);
+        gridPane.setHgap(1);
+        gridPane.setVgap(1);
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                gridPane.add(new Rectangle(30, 30, Color.LIGHTGREY), i, j);
+            }
         }
     }
-}
 
-private void setActionsOnEnemyBoard(GridPane gridPane) {
-    for (Node element : gridPane.getChildren()) {
-        element.setOnMouseClicked(e -> {
-            try {
-                controller.makeShot(e);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            } catch (ClassNotFoundException e1) {
-                e1.printStackTrace();
-            }
-        });
+    private void setActionsOnEnemyBoard(GridPane gridPane) {
+        for (Node element : gridPane.getChildren()) {
+            element.setOnMouseClicked(e -> {
+                try {
+                    controller.makeShot(e);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } catch (ClassNotFoundException e1) {
+                    e1.printStackTrace();
+                }
+            });
+        }
     }
-}
 
     private void setActionsOnYourBoard(GridPane gridPane) {
         for (Node element : gridPane.getChildren()) {

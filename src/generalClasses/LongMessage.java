@@ -4,10 +4,15 @@ import battleship.utils.Board;
 
 import java.io.Serializable;
 
-public class Message implements Serializable {
+public class LongMessage implements Serializable {
     private String nickname;
     private String[] onlineUsers;
     private Board board;
+    private String response;
+
+    public String getResponse() {
+        return response;
+    }
 
     public String[] getOnlineUsers() {
         return onlineUsers;
@@ -25,7 +30,7 @@ public class Message implements Serializable {
         this.nickname = nickname;
     }
 
-    public Message(String nickname, Board board) {
+    public LongMessage(String nickname, Board board) {
         this.nickname = nickname;
         this.board = board;
     }

@@ -2,8 +2,8 @@ package intermediateServer.utils;
 
 import battleship.utils.Board;
 import generalClasses.ClientInfo;
-import generalClasses.Message;
-import intermediateServer.IntrServer;
+import generalClasses.LongMessage;
+import intermediateServer.Server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,7 +16,7 @@ public class ServerClientSession extends Thread {
     private final Socket socket;
     private String nickName;
     private Board board;
-    private Message message;
+    private LongMessage longMessage;
 
     public ServerClientSession(final Socket socket) {
         this.socket = socket;
@@ -27,13 +27,14 @@ public class ServerClientSession extends Thread {
     public void run() {
         try {
             final ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
-            this.message = (Message) inputStream.readObject();
-            this.nickName = this.message.getNickname();
-            this.board = this.message.getBoard();
+            this.longMessage = (LongMessage) inputStream.readObject();
+            this.nickName = this.longMessage.getNickname();
+            this.board = this.longMessage.getBoard();
             final ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-            IntrServer.getUserList().addUser(nickName, socket, outputStream, inputStream, board);
-            this.message.setOnlineUsers(IntrServer.getUserList().getUsersName());
-            this.broadcast(IntrServer.getUserList().getClientsList(), this.message);
+            Server.getUserList().addUser(nickName, socket, outputStream, inputStream, board);
+            this.longMessage.setOnlineUsers(Server.getUserList().getUsersName());
+            this.broadcast(Server.getUserList().getClientsList(), this.longMessage);
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -41,14 +42,14 @@ public class ServerClientSession extends Thread {
         }
     }
 
-    private void broadcast(ArrayList<ClientInfo> clientsList, Message message) {
+    private void broadcast(ArrayList<ClientInfo> clientsList, LongMessage longMessage) {
         try {
             for (ClientInfo client : clientsList) {
-                client.getThisObjectOutputStream().writeObject(message);
+                client.getThisObjectOutputStream().writeObject(longMessage);
             }
         } catch (SocketException e) {
             System.out.println("in broadcast: " + this.nickName + " disconnected!");
-            IntrServer.getUserList().deleteUser(nickName);
+            Server.getUserList().deleteUser(nickName);
         } catch (IOException e) {
             e.printStackTrace();
         }

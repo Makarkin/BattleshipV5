@@ -6,15 +6,18 @@ import intermediateServer.utils.UsersList;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
-public class IntrServer extends Thread {
+public class Server extends Thread {
 
     private int port;
 
     private static UsersList usersList = new UsersList();
+    private static BlockingQueue<String> requstList = new ArrayBlockingQueue<>(10);
 
 
-    public IntrServer(int port) {
+    public Server(int port) {
         this.port = port;
     }
 
