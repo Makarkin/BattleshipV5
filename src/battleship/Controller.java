@@ -9,9 +9,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Rectangle;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,13 +20,13 @@ import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.GREEN;
 
 public class Controller {
+
+    private MainView mainView;
     private final int port;
     private final String intrServerAddress;
-    private String nickname;
     private ClientModel clientModel;
     private List<Integer> counterList = Arrays.asList(0, 4, 7, 10, 12, 14, 16, 17, 18, 19, 20);
     private List<Integer> numberOfDeckList = Arrays.asList(4, 3, 3, 2, 2, 2, 1, 1, 1, 1);
-    Cell[][] enemyCells = new Cell[10][10];
     private ArrayList<IndexVault> itShouldFrozen = new ArrayList<>();
     private int yourSumOfDecks = 20;
     private int enemySumOfDecks = 20;
@@ -36,32 +34,33 @@ public class Controller {
     private Integer predJ = null;
     private int counter = 0;
     private int counterOfDeck = 0;
-    private int index = 0;
+    private int numberOfShipsOnBoard = 0;
     private Board yourBoard = new Board();
     static boolean yourTurn = false;
 
-    Controller(String intrServerAddres, int port, String nickname) {
+    Controller(String intrServerAddres, int port, MainView mainView) {
         this.port = port;
-        this.nickname = nickname;
         this.intrServerAddress = intrServerAddres;
-        //clientModel.start();
+        this.mainView = mainView;
     }
-
 
     void runToServer(ActionEvent actionEvent) throws IOException {
-        if (counter == 20)
+        if (numberOfShipsOnBoard == 10) {
         System.out.println("Start");
-        this.clientModel = new ClientModel(intrServerAddress, port, nickname, yourBoard);
+        this.clientModel = new ClientModel(intrServerAddress, port, mainView.getYouLabel().getText(), yourBoard);
         this.clientModel.start();
-
+        yourTurn = true;
+        }
     }
 
-    void makeShot(MouseEvent mouseEvent) {
+    void makeShot(MouseEvent mouseEvent) throws IOException {
         if (yourTurn) {
             Rectangle rectangle = (Rectangle) mouseEvent.getSource();
             Integer i = GridPane.getRowIndex(rectangle);
             Integer j = GridPane.getColumnIndex(rectangle);
             rectangle.setFill(BLACK);
+            String fireCoordinates = i + " " + j;
+            clientModel.transferFire(fireCoordinates);
             yourTurn = false;
         }
     }
@@ -98,7 +97,7 @@ public class Controller {
                 cell.setModifable(false);
                 yourBoard.setIndexCell(cell, i, j);
                 itShouldFrozen.add(new IndexVault(i, j));
-                if (counterOfDeck < numberOfDeckList.get(index)) {
+                if (counterOfDeck < numberOfDeckList.get(numberOfShipsOnBoard)) {
                     if (i > 0 && i < 9) {
                         if (!yourBoard.getIndexCell(i - 1, j).isFrozen()) yourBoard.getIndexCell(i - 1, j).setModifable(true);
                         if (!yourBoard.getIndexCell(i + 1, j).isFrozen()) yourBoard.getIndexCell(i + 1, j).setModifable(true);
@@ -110,10 +109,11 @@ public class Controller {
                         if (!yourBoard.getIndexCell(i - 1, j).isFrozen()) yourBoard.getIndexCell(i - 1, j).setModifable(true);
                     }
                 } else {
-                    index++;
+                    numberOfShipsOnBoard++;
                     counterOfDeck = 0;
                     freezeCell(itShouldFrozen, yourBoard);
                     itShouldFrozen.clear();
+                    mainView.getGameMessage().setText("You have left to place " + (10 - numberOfShipsOnBoard) + " ships");
                 }
             }
         } else if (mouseButton == SECONDARY) {//horizontal placing
@@ -133,7 +133,7 @@ public class Controller {
                 cell.setModifable(false);
                 yourBoard.setIndexCell(cell, i, j);
                 itShouldFrozen.add(new IndexVault(i, j));
-                if (counterOfDeck < numberOfDeckList.get(index)) {
+                if (counterOfDeck < numberOfDeckList.get(numberOfShipsOnBoard)) {
                     if (j > 0 && j < 9) {
                         if (!yourBoard.getIndexCell(i, j - 1).isFrozen()) yourBoard.getIndexCell(i, j - 1).setModifable(true);
                         if (!yourBoard.getIndexCell(i, j + 1).isFrozen()) yourBoard.getIndexCell(i, j + 1).setModifable(true);
@@ -145,10 +145,11 @@ public class Controller {
                         if (!yourBoard.getIndexCell(i, j - 1).isFrozen()) yourBoard.getIndexCell(i, j - 1).setModifable(true);
                     }
                 } else {
-                    index++;
+                    numberOfShipsOnBoard++;
                     counterOfDeck = 0;
                     freezeCell(itShouldFrozen, yourBoard);
                     itShouldFrozen.clear();
+                    mainView.getGameMessage().setText("You have left to place " + (10 - numberOfShipsOnBoard) + " ships");
                 }
             }
         }

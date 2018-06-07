@@ -29,9 +29,22 @@ public class MainView extends Application {
     private GridPane enemyBoard;
     private Label youLabel;
     private Label enemyLabel;
+    private Label gameMessage;
     private Button startButton;
 
-private void addRectangle(GridPane gridPane) {
+    Label getYouLabel() {
+        return youLabel;
+    }
+
+    public Label getEnemyLabel() {
+        return enemyLabel;
+    }
+
+    Label getGameMessage() {
+        return gameMessage;
+    }
+
+    private void addRectangle(GridPane gridPane) {
     gridPane.setGridLinesVisible(true);
     gridPane.setHgap(1);
     gridPane.setVgap(1);
@@ -45,16 +58,18 @@ private void addRectangle(GridPane gridPane) {
 private void setActionsOnEnemyBoard(GridPane gridPane) {
     for (Node element : gridPane.getChildren()) {
         element.setOnMouseClicked(e -> {
-            controller.makeShot(e);
+            try {
+                controller.makeShot(e);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         });
     }
 }
 
     private void setActionsOnYourBoard(GridPane gridPane) {
         for (Node element : gridPane.getChildren()) {
-            element.setOnMouseClicked(e -> {
-                controller.placeShip(e);
-            });
+            element.setOnMouseClicked(e -> controller.placeShip(e));
         }
     }
 
@@ -70,36 +85,48 @@ private void setActionsOnEnemyBoard(GridPane gridPane) {
 
     private Parent createContent() {
         parentPane.setPrefSize(1000, 600);
+
         yourBoard.setPrefSize(392, 314);
         addRectangle(yourBoard);
         setActionsOnYourBoard(yourBoard);
+        yourBoard.relocate(100,100);
+
         enemyBoard.setPrefSize(392, 314);
         addRectangle(enemyBoard);
         setActionsOnEnemyBoard(enemyBoard);
+        enemyBoard.relocate(700, 100);
+
         startButton.setPrefSize(50, 30);
         setActionsOnYourButton(startButton);
         startButton.relocate(460, 400);
-        yourBoard.relocate(100,100);
+
+
         youLabel.relocate(100,60);
-        enemyBoard.relocate(600, 100);
-        enemyLabel.relocate(600,60);
         youLabel.setFont(Font.font(18));
+
+        enemyLabel.relocate(700,60);
         enemyLabel.setFont(Font.font(18));
-        parentPane.getChildren().addAll(yourBoard, enemyBoard, youLabel, enemyLabel, startButton);
+
+        gameMessage.relocate(420, 200);
+        gameMessage.setFont(Font.font(18));
+
+        parentPane.getChildren().addAll(yourBoard, enemyBoard, youLabel, enemyLabel, gameMessage ,startButton);
         return parentPane;
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) {
         parentPane = new Pane();
         yourBoard = new GridPane();
         enemyBoard = new GridPane();
         youLabel = new Label();
         enemyLabel = new Label();
+        gameMessage = new Label();
         startButton = new Button();
 
         enemyLabel.setText("Enemy");
         startButton.setText("Start");
+        gameMessage.setText("Place your ship");
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter your nickname");
@@ -108,10 +135,10 @@ private void setActionsOnEnemyBoard(GridPane gridPane) {
         String address = "127.0.0.1"/*scanner.nextLine()*/;
         System.out.println("Enter port of server");
         int port = 6667/*Integer.parseInt(scanner.nextLine())*/;
-        controller = new Controller(address, port, youLabel.getText());
+        controller = new Controller(address, port,this);
 
         Scene scene = new Scene(createContent());
-        primaryStage.setTitle("Battleship Game");
+        primaryStage.setTitle("Battleships Game");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();

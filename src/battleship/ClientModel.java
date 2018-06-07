@@ -19,7 +19,7 @@ public class ClientModel extends Thread {
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
 
-    public ClientModel(String inetAddressIntrServer, int portIntrServer, String nickname, Board board) throws IOException {
+    ClientModel(String inetAddressIntrServer, int portIntrServer, String nickname, Board board) throws IOException {
         InetAddress address = InetAddress.getByName(inetAddressIntrServer);
         this.socket = new Socket(address, portIntrServer);
         this.nickname = nickname;
@@ -36,17 +36,24 @@ public class ClientModel extends Thread {
             outputStream.writeObject(message);
 
             inputStream = new ObjectInputStream(this.socket.getInputStream());
-            while (flag) {
+
                 Message mes = (Message) inputStream.readObject();
-                String[] users = (String[]) mes.getOnlineUsers();
+                String[] users = mes.getOnlineUsers();
                 showUsers(users);
                 sendRequestToPlayer(users);
-            }
+
+                outputStream.reset();
+                inputStream.reset();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    void transferFire(String fireCoordinates) throws IOException {
+        outputStream = new ObjectOutputStream(this.socket.getOutputStream());
+        outputStream.writeObject(fireCoordinates);
     }
 
     private void sendRequestToPlayer(String[] users) {
@@ -63,9 +70,5 @@ public class ClientModel extends Thread {
         for (String user : users) {
             System.out.println(i + " " + user);
         }
-    }
-
-    public void runToPlayer () {
-
     }
 }
