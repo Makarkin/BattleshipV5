@@ -1,6 +1,8 @@
 package battleship;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -51,18 +53,18 @@ private void setActionsOnEnemyBoard(GridPane gridPane) {
     private void setActionsOnYourBoard(GridPane gridPane) {
         for (Node element : gridPane.getChildren()) {
             element.setOnMouseClicked(e -> {
-                try {
-                    controller.placeShip(e);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+                controller.placeShip(e);
             });
         }
     }
 
     private void setActionsOnYourButton(Button button) {
-        button.setOnAction(e -> {
-            controller.runToServer();
+        button.setOnAction(event -> {
+            try {
+                controller.runToServer(event);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
     }
 
@@ -75,6 +77,7 @@ private void setActionsOnEnemyBoard(GridPane gridPane) {
         addRectangle(enemyBoard);
         setActionsOnEnemyBoard(enemyBoard);
         startButton.setPrefSize(50, 30);
+        setActionsOnYourButton(startButton);
         startButton.relocate(460, 400);
         yourBoard.relocate(100,100);
         youLabel.relocate(100,60);

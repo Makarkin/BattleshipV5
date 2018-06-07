@@ -3,6 +3,7 @@ package battleship;
 import battleship.utils.Board;
 import battleship.utils.Cell;
 import battleship.utils.IndexVault;
+import javafx.event.ActionEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -10,15 +11,19 @@ import javafx.scene.shape.Rectangle;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static javafx.scene.input.MouseButton.PRIMARY;
 import static javafx.scene.input.MouseButton.SECONDARY;
+import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.GREEN;
 
 public class Controller {
+    private final int port;
+    private final String intrServerAddress;
     private String nickname;
     private ClientModel clientModel;
     private List<Integer> counterList = Arrays.asList(0, 4, 7, 10, 12, 14, 16, 17, 18, 19, 20);
@@ -35,16 +40,20 @@ public class Controller {
     private Board yourBoard = new Board();
     static boolean yourTurn = false;
 
-    Controller(String intrServerAddres, int port, String nickname) throws IOException {
-        this.clientModel = new ClientModel(intrServerAddres, port, nickname);
-        clientModel.start();
+    Controller(String intrServerAddres, int port, String nickname) {
+        this.port = port;
+        this.nickname = nickname;
+        this.intrServerAddress = intrServerAddres;
+        //clientModel.start();
     }
 
 
-    void runToServer() {
-        if (counter == 20) {
-        this.clientModel.run();
-        }
+    void runToServer(ActionEvent actionEvent) throws IOException {
+        if (counter == 20)
+        System.out.println("Start");
+        this.clientModel = new ClientModel(intrServerAddress, port, nickname, yourBoard);
+        this.clientModel.start();
+
     }
 
     void makeShot(MouseEvent mouseEvent) {
@@ -52,12 +61,12 @@ public class Controller {
             Rectangle rectangle = (Rectangle) mouseEvent.getSource();
             Integer i = GridPane.getRowIndex(rectangle);
             Integer j = GridPane.getColumnIndex(rectangle);
-            clientModel.runToPlayer();
+            rectangle.setFill(BLACK);
             yourTurn = false;
         }
     }
 
-    void placeShip(MouseEvent mouseEvent) throws IOException {
+    void placeShip(MouseEvent mouseEvent) {
         MouseButton mouseButton = mouseEvent.getButton();
         Rectangle rectangle = (Rectangle) mouseEvent.getSource();
         Integer i = GridPane.getRowIndex(rectangle);

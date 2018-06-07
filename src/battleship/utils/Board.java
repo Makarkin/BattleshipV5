@@ -1,6 +1,8 @@
 package battleship.utils;
 
-public class Board {
+import java.io.Serializable;
+
+public class Board implements Serializable {
     private Cell[][] cells = new Cell[10][10];
 
     public Cell[][] getCells() {

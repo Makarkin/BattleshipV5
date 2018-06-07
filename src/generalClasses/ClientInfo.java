@@ -1,24 +1,28 @@
 package generalClasses;
 
+import battleship.utils.Board;
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 
-public class ClientInfo {
+public class ClientInfo implements Serializable {
 
     private Socket socket;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
+    Board board;
 
     public ClientInfo(Socket socket){
         this.socket = socket;
     }
 
-    public ClientInfo(Socket socket , ObjectOutputStream outputStream , ObjectInputStream inputStream) {
+    public ClientInfo(Socket socket , ObjectOutputStream outputStream , ObjectInputStream inputStream, Board board) {
         this.socket = socket;
         this.outputStream = outputStream;
         this.inputStream = inputStream;
+        this.board = board;
     }
 
     public Socket getSocket() {

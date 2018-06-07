@@ -1,6 +1,8 @@
 package battleship.utils;
 
-public class Cell {
+import java.io.Serializable;
+
+public class Cell implements Serializable {
     private boolean withShip = false;
     private boolean wasShoot = false;
     private boolean isModifable = false;

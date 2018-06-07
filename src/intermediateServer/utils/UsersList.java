@@ -1,5 +1,6 @@
 package intermediateServer.utils;
 
+import battleship.utils.Board;
 import generalClasses.ClientInfo;
 
 import java.io.ObjectInputStream;
@@ -14,18 +15,18 @@ public class UsersList {
 
     private Map<String, ClientInfo> onlineUsers = new HashMap<String, ClientInfo>();
 
-    public void addUser(String nickname, Socket socket, ObjectOutputStream outputStream, ObjectInputStream inputStream) {
+    public void addUser(String nickname, Socket socket, ObjectOutputStream outputStream, ObjectInputStream inputStream, Board board) {
         System.out.println(nickname + " connected");
 
         if (!this.onlineUsers.containsKey(nickname)) {
-            this.onlineUsers.put(nickname, new ClientInfo(socket, outputStream, inputStream));
+            this.onlineUsers.put(nickname, new ClientInfo(socket, outputStream, inputStream, board));
         } else {
             int i = 1;
             while (this.onlineUsers.containsKey(nickname)) {
                 nickname = nickname + i;
                 i++;
             }
-            this.onlineUsers.put(nickname, new ClientInfo(socket, outputStream, inputStream));
+            this.onlineUsers.put(nickname, new ClientInfo(socket, outputStream, inputStream, board));
         }
     }
 

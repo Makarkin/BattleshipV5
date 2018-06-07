@@ -13,6 +13,7 @@ public class IntrServer extends Thread {
 
     private static UsersList usersList = new UsersList();
 
+
     public IntrServer(int port) {
         this.port = port;
     }

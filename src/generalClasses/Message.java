@@ -1,36 +1,36 @@
 package generalClasses;
 
+import battleship.utils.Board;
+
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
 
 public class Message implements Serializable {
     private String nickname;
-    private String[] users;
+    private String[] onlineUsers;
+    private Board board;
 
-    public String[] getUsers() {
-        return users;
+    public String[] getOnlineUsers() {
+        return onlineUsers;
     }
 
     public String getNickname() {
         return nickname;
     }
 
+    public Board getBoard() {
+        return board;
+    }
+
     public void setNickname(String nickname) {
         this.nickname = nickname;
     }
 
-    public Message(String nickname) {
+    public Message(String nickname, Board board) {
         this.nickname = nickname;
-    }
-
-    public Message(String nickname, String[] users) {
-        this.nickname = nickname;
-        this.users = users;
+        this.board = board;
     }
 
     public void setOnlineUsers(String[] onlineUsers) {
-        this.users = onlineUsers;
+        this.onlineUsers = onlineUsers;
     }
 }
