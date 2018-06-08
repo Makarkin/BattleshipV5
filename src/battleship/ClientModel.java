@@ -17,6 +17,7 @@ public class ClientModel extends Thread {
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
     private String opponentName;
+    private String request;
 
     ClientModel(Controller controller) throws IOException {
         InetAddress address = InetAddress.getByName(controller.getIntrServerAddress());
@@ -40,9 +41,8 @@ public class ClientModel extends Thread {
                 users = mes.getOnlineUsers();//если юзеров нет - то это ответ на запрос.
                 if (users.length > 0) {
                     showUser(users);
-                    String request = new String();
-                    chooseUser(users, request);
-                    if (request != null) {
+                    chooseUser(users);
+                    if (request != "") {
                         outputStream.writeObject(new LongMessage(request));
                     }
                 } else {
@@ -85,7 +85,7 @@ public class ClientModel extends Thread {
         }
     }
 
-    private void chooseUser(String[] users, String request) {
+    private void chooseUser(String[] users) {
         System.out.println("Choose number of your opponent. For refresh opponents list enter \"r\" ");
         Scanner scanner = new Scanner(System.in);
         int index;
@@ -105,13 +105,14 @@ public class ClientModel extends Thread {
 
     private void showUser(String[] users) {
         Date date = new Date();
-        int i = 0;
+
         String[] info;
         System.out.println(date.toString());
-        for (String user : users) {
-            info = user.split(" ");
+        for (int i = 0; i < users.length; i++) {
+            info = users[i].split(" ");
             if (!controller.getMainView().getYouLabel().getText().equals(info[0])) {
                 System.out.println("Number of player: " + i + "; Name: " + info[0] + "; Is busy: " + info[1]);
+
             }
         }
     }

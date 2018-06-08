@@ -136,7 +136,7 @@ public class MainView extends Application {
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter your nickname");
-        youLabel.setText("Stas"/*scanner.nextLine()*/);
+        youLabel.setText(/*Stas"*/scanner.nextLine());
         System.out.println("Enter addres of server");
         String address = "127.0.0.1"/*scanner.nextLine()*/;
         System.out.println("Enter port of server");

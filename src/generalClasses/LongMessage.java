@@ -8,7 +8,7 @@ public class LongMessage implements Serializable {
     private String nickname;
     private String[] onlineUsers;
     private Board board;
-    private String report;
+    private String report = "";
 
     public String getReport() {
         return report;

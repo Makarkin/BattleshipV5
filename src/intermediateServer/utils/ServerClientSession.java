@@ -43,8 +43,12 @@ public class ServerClientSession extends Thread {
 
             latch.countDown();
 
-            this.request = ((LongMessage) inputStream.readObject()).getReport();
-            Server.getRequestList().add(this.request);
+            while (flag) {
+                request = ((LongMessage) inputStream.readObject()).getReport();
+                if (request != "") {
+                    Server.getRequestList().add(this.request);
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
