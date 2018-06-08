@@ -84,30 +84,38 @@ public class Controller {
             rectangle.setFill(BLACK);
             String fireCoordinates = "fire" + " " + i + " " + j;
             clientModel.transferFire(fireCoordinates);
-            boolean result = clientModel.acceptResultOfYourFire();
-            if (result) {
-                rectangle.setFill(RED);
-                enemySumOfDecks--;
-                if (enemySumOfDecks == 0) {
-                    mainView.getGameMessage().setText("You win!");
-                    clientModel.transferVictoryMessage();
-                }
-            }
-
-            getShot();
-            yourTurn = true;
         }
     }
 
-    private void getShot() throws IOException, ClassNotFoundException {
-        String[] result = clientModel.acceptFire();
-        int i = Integer.valueOf(result[1]);
-        int j = Integer.valueOf(result[2]);
-        Boolean bool = Boolean.valueOf(result[3]);
-        if (bool) {
-            Rectangle rectangle = (Rectangle) getNodeFromGridPane(mainView.getYourBoard(), i, j);
-            rectangle.setFill(RED);
+    void acceptResult(String[] result) {
+        int i = Integer.valueOf(result[0]);
+        int j = Integer.valueOf(result[1]);
+        Rectangle rectangle = (Rectangle) getNodeFromGridPane(mainView.getEnemyBoard(), i, j);
+        rectangle.setFill(RED);
+        enemySumOfDecks--;
+        if (enemySumOfDecks == 0) {
+            mainView.getGameMessage().setText("You win!");
+            clientModel.transferVictoryMessage();
         }
+    }
+
+     void getShot(String[] result) {
+         int i = Integer.valueOf(result[0]);
+         int j = Integer.valueOf(result[1]);
+         Rectangle rectangle = (Rectangle) getNodeFromGridPane(mainView.getYourBoard(), i, j);
+         rectangle.setFill(RED);
+         yourSumOfDecks--;
+         if (yourSumOfDecks == 0) {
+             mainView.getGameMessage().setText("You lose!");
+             clientModel.transferLoseMessage();
+         }
+     }
+
+    void getShotPast(String[] result) {
+        int i = Integer.valueOf(result[0]);
+        int j = Integer.valueOf(result[1]);
+        Rectangle rectangle = (Rectangle) getNodeFromGridPane(mainView.getYourBoard(), i, j);
+        rectangle.setFill(BLACK);
     }
 
     private Node getNodeFromGridPane(GridPane gridPane, int row, int col) {

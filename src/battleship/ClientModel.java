@@ -46,9 +46,20 @@ public class ClientModel extends Thread {
                         outputStream.writeObject(new LongMessage(request));
                     }
                 } else {
-/*                    opponentName = mes.getReport();
-                    controller.getMainView().getEnemyLabel().setText(opponentName);*/
-                    //решение под ответ на реквест
+                    String[] response = mes.getReport().split(" ");
+                    String element = response[0];
+                    if ("y".equals(element)) {
+                        opponentName = response[1];
+                        controller.getMainView().getEnemyLabel().setText(opponentName);
+                    } else if ("n".equals(element)) {
+                        return;
+                    } else if ("enemyResult".equals(element)) {
+                        acceptFire(response);
+                    } else if ("yourResult".equals(element)) {
+                        acceptResultOfYourFire(response);
+                    } else if ("Do".equals(element)) {
+                        acceptOrrejectPlayer(response);
+                    }
                 }
             }
 
@@ -58,6 +69,19 @@ public class ClientModel extends Thread {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void acceptOrrejectPlayer(String[] response) throws IOException {
+        System.out.printf("Do you want to play with %s ? y/n", response[response.length]);
+        Scanner scanner = new Scanner(System.in);
+        String s = scanner.nextLine().toLowerCase();
+        if ("y".equals(s)) {
+            opponentName = response[response.length];
+            outputStream.writeObject(new LongMessage("y"));
+        } else {
+            outputStream.writeObject(new LongMessage("n"));
+            return;
         }
     }
 
@@ -79,21 +103,6 @@ public class ClientModel extends Thread {
         }
     }
 
-    void transferFire(String fireCoordinates) throws IOException {
-        fireCoordinates += String.format(" %s %s", opponentName, controller.getMainView().getYouLabel().getText());
-        outputStream = new ObjectOutputStream(this.socket.getOutputStream());
-        outputStream.writeObject(fireCoordinates);
-        outputStream.flush();
-        outputStream.reset();
-    }
-
-    Boolean acceptResultOfYourFire() throws IOException, ClassNotFoundException {
-        inputStream = new ObjectInputStream(this.socket.getInputStream());
-        LongMessage result = (LongMessage) inputStream.readObject();
-        inputStream.reset();
-        return Boolean.valueOf(result.getReport().split(" ")[1]);
-    }
-
     private void showUser(String[] users) {
         Date date = new Date();
         int i = 0;
@@ -107,14 +116,41 @@ public class ClientModel extends Thread {
         }
     }
 
-    void transferVictoryMessage() {
+    void transferFire(String fireCoordinates) throws IOException {
+        fireCoordinates += String.format(" %s %s", opponentName, controller.getMainView().getYouLabel().getText());
+        outputStream = new ObjectOutputStream(this.socket.getOutputStream());
+        outputStream.writeObject(fireCoordinates);
+        outputStream.flush();
+        outputStream.reset();
     }
 
-    String[] acceptFire() throws IOException, ClassNotFoundException {
-        inputStream = new ObjectInputStream(this.socket.getInputStream());
-        LongMessage result = (LongMessage) inputStream.readObject();
-        String[] tempArray = result.getReport().split(" ");
+    private void acceptResultOfYourFire(String[] response) throws IOException, ClassNotFoundException {
+        String[] tempArray = new String[2];
+        tempArray[0] = response[1];
+        tempArray[1] = response[2];
+        if (Boolean.valueOf(response[response.length])) {
+            controller.acceptResult(tempArray);
+        }
+
         inputStream.reset();
-        return tempArray;
+    }
+
+    private void acceptFire(String[] enemyFire) throws IOException, ClassNotFoundException {
+        String[] tempArray = new String[2];
+        tempArray[0] = enemyFire[1];
+        tempArray[1] = enemyFire[2];
+        if (Boolean.valueOf(enemyFire[enemyFire.length])) {
+            controller.getShot(tempArray);
+        } else {
+            controller.getShotPast(tempArray);
+        }
+
+        inputStream.reset();
+    }
+
+    void transferLoseMessage() {
+    }
+
+    void transferVictoryMessage() {
     }
 }

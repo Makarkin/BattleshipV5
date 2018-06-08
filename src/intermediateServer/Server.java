@@ -18,7 +18,7 @@ public class Server extends Thread {
 
     private static UsersList usersList = new UsersList();
     private static BlockingQueue<String> requestList = new ArrayBlockingQueue<>(10);
-//написать обработчик запросов
+
     public synchronized static BlockingQueue<String> getRequestList() {
         return requestList;
     }
@@ -27,7 +27,7 @@ public class Server extends Thread {
         return usersList;
     }
 
-    public Server(int port) {
+    Server(int port) {
         this.port = port;
     }
 
@@ -65,9 +65,11 @@ public class Server extends Thread {
         usersList.getUsers().get(requestTo).getThisObjectOutputStream().writeObject(new LongMessage(request));
         LongMessage response = (LongMessage) usersList.getUsers().get(requestTo).getThisObjectInputStream().readObject();
         if ("y".equals(response.getReport())) {
-          usersList.getUsers().get(requestFrom).setBusy(true);
-          usersList.getUsers().get(requestTo).setBusy(true);
-
+            usersList.getUsers().get(requestFrom).setBusy(true);
+            usersList.getUsers().get(requestTo).setBusy(true);
+            usersList.getUsers().get(requestFrom).getThisObjectOutputStream().writeObject(new LongMessage("y " + requestTo));
+        } else {
+            usersList.getUsers().get(requestFrom).getThisObjectOutputStream().writeObject(new LongMessage("n"));
         }
     }
 
@@ -76,15 +78,15 @@ public class Server extends Thread {
         int j = Integer.valueOf(requestBody[2]);
         String fireToName = requestBody[3];
         String fireFromName = requestBody[4];
-        String resultForShooter = new String();
-        String resultForUnderFire = new String();
+        String resultForShooter;
+        String resultForUnderFire;
         if (usersList.getUsers().get(fireToName).getBoard().getIndexCell(i, j).isWithShip()) {
-            resultForShooter = "yourResult true";
+            resultForShooter = String.format("yourResult %s %s true", i, j);
             resultForUnderFire = String.format("enemyResult %s %s true", i, j);
             usersList.getUsers().get(fireToName).getThisObjectOutputStream().writeObject(new LongMessage(resultForUnderFire));
             usersList.getUsers().get(fireFromName).getThisObjectOutputStream().writeObject(new LongMessage(resultForShooter));
         } else {
-            resultForShooter = "yourResult false";
+            resultForShooter = String.format("yourResult %s %s false", i, j);
             resultForUnderFire = String.format("enemyResult %s %s false", i, j);
             usersList.getUsers().get(fireToName).getThisObjectOutputStream().writeObject(new LongMessage(resultForUnderFire));
             usersList.getUsers().get(fireFromName).getThisObjectOutputStream().writeObject(new LongMessage(resultForShooter));
