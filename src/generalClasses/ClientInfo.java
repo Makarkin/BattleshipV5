@@ -15,6 +15,10 @@ public class ClientInfo implements Serializable {
     private Board board;
     private Boolean isBusy = false;
 
+    public Board getBoard() {
+        return board;
+    }
+
     public Boolean getBusy() {
         return isBusy;
     }

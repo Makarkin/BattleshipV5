@@ -80,7 +80,7 @@ public class ClientModel extends Thread {
     }
 
     void transferFire(String fireCoordinates) throws IOException {
-        fireCoordinates = fireCoordinates + " " + opponentName;
+        fireCoordinates += String.format(" %s %s", opponentName, controller.getMainView().getYouLabel().getText());
         outputStream = new ObjectOutputStream(this.socket.getOutputStream());
         outputStream.writeObject(fireCoordinates);
         outputStream.flush();

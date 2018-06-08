@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 public class ServerClientSession extends Thread {
     private final Socket socket;
@@ -18,9 +19,11 @@ public class ServerClientSession extends Thread {
     private Board board;
     private LongMessage longMessage;
     private String request;
+    private CountDownLatch latch;
 
-    public ServerClientSession(final Socket socket) {
+    public ServerClientSession(final Socket socket, CountDownLatch latch) {
         this.socket = socket;
+        this.latch = latch;
         this.start();
     }
 
@@ -36,6 +39,8 @@ public class ServerClientSession extends Thread {
             Server.getUserList().addUser(nickName, socket, outputStream, inputStream, board);
             this.longMessage.setOnlineUsers(Server.getUserList().getUsersName());
             this.broadcast(Server.getUserList().getClientsList(), this.longMessage);
+
+            latch.countDown();
 
             this.request = ((LongMessage) inputStream.readObject()).getReport();
             Server.getRequestList().add(this.request);
