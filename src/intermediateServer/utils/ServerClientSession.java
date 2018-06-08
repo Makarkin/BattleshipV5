@@ -20,6 +20,7 @@ public class ServerClientSession extends Thread {
     private LongMessage longMessage;
     private String request;
     private CountDownLatch latch;
+    private Boolean flag = true;
 
     public ServerClientSession(final Socket socket, CountDownLatch latch) {
         this.socket = socket;

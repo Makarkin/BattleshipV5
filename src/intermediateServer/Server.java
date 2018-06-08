@@ -1,5 +1,6 @@
 package intermediateServer;
 
+import generalClasses.LongMessage;
 import intermediateServer.utils.ServerClientSession;
 import intermediateServer.utils.UsersList;
 
@@ -47,27 +48,27 @@ public class Server extends Thread {
                     String[] requestBody = request.split(" ");
                     if ("fire".equals(requestBody[0])) {
                         fireMethod(requestBody);
-                    } else if ("result".equals(requestBody[0])) {
-                        resultMethod(requestBody);
                     } else if ("request".equals(requestBody[0])) {
                         requestMethod(requestBody);
                     }
                 }
-                    //написать обработчик запросов по ключевым словам
-
-
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    private void requestMethod(String[] requestBody) {
-    }
+    private void requestMethod(String[] requestBody) throws IOException, ClassNotFoundException {
+        String requestTo = requestBody[1];
+        String requestFrom = requestBody[2];
+        String request = String.format("Do you want to play with %s?", requestFrom);
+        usersList.getUsers().get(requestTo).getThisObjectOutputStream().writeObject(new LongMessage(request));
+        LongMessage response = (LongMessage) usersList.getUsers().get(requestTo).getThisObjectInputStream().readObject();
+        if ("y".equals(response.getReport())) {
+          usersList.getUsers().get(requestFrom).setBusy(true);
+          usersList.getUsers().get(requestTo).setBusy(true);
 
-    private void resultMethod(String[] requestBody) {
+        }
     }
 
     private void fireMethod(String[] requestBody) throws IOException {
@@ -80,13 +81,13 @@ public class Server extends Thread {
         if (usersList.getUsers().get(fireToName).getBoard().getIndexCell(i, j).isWithShip()) {
             resultForShooter = "yourResult true";
             resultForUnderFire = String.format("enemyResult %s %s true", i, j);
-            usersList.getUsers().get(fireToName).getThisObjectOutputStream().writeObject(resultForUnderFire);
-            usersList.getUsers().get(fireFromName).getThisObjectOutputStream().writeObject(resultForShooter);
+            usersList.getUsers().get(fireToName).getThisObjectOutputStream().writeObject(new LongMessage(resultForUnderFire));
+            usersList.getUsers().get(fireFromName).getThisObjectOutputStream().writeObject(new LongMessage(resultForShooter));
         } else {
             resultForShooter = "yourResult false";
             resultForUnderFire = String.format("enemyResult %s %s false", i, j);
-            usersList.getUsers().get(fireToName).getThisObjectOutputStream().writeObject(resultForUnderFire);
-            usersList.getUsers().get(fireFromName).getThisObjectOutputStream().writeObject(resultForShooter);
+            usersList.getUsers().get(fireToName).getThisObjectOutputStream().writeObject(new LongMessage(resultForUnderFire));
+            usersList.getUsers().get(fireFromName).getThisObjectOutputStream().writeObject(new LongMessage(resultForShooter));
         }
     }
 }

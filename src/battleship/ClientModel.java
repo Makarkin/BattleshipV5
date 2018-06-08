@@ -46,8 +46,8 @@ public class ClientModel extends Thread {
                         outputStream.writeObject(new LongMessage(request));
                     }
                 } else {
-                    opponentName = mes.getReport();
-                    controller.getMainView().getEnemyLabel().setText(opponentName);
+/*                    opponentName = mes.getReport();
+                    controller.getMainView().getEnemyLabel().setText(opponentName);*/
                     //решение под ответ на реквест
                 }
             }
@@ -72,7 +72,7 @@ public class ClientModel extends Thread {
             index = Integer.valueOf(s);
             String[] result = users[index].split(" ");
             if (!Boolean.valueOf(result[1])) {
-                 request = "request " + result[0];
+                 request = "request " + result[0] + " " + controller.getMainView().getYouLabel().getText();
             } else {
                 return;
             }
@@ -89,9 +89,9 @@ public class ClientModel extends Thread {
 
     Boolean acceptResultOfYourFire() throws IOException, ClassNotFoundException {
         inputStream = new ObjectInputStream(this.socket.getInputStream());
-        Boolean result = (Boolean) inputStream.readObject();
+        LongMessage result = (LongMessage) inputStream.readObject();
         inputStream.reset();
-        return result;
+        return Boolean.valueOf(result.getReport().split(" ")[1]);
     }
 
     private void showUser(String[] users) {
@@ -110,18 +110,11 @@ public class ClientModel extends Thread {
     void transferVictoryMessage() {
     }
 
-    int[] acceptFire() throws IOException, ClassNotFoundException {
+    String[] acceptFire() throws IOException, ClassNotFoundException {
         inputStream = new ObjectInputStream(this.socket.getInputStream());
-        int[] result = (int[]) inputStream.readObject();
+        LongMessage result = (LongMessage) inputStream.readObject();
+        String[] tempArray = result.getReport().split(" ");
         inputStream.reset();
-        return result;
-    }
-
-    void transferResultOfEnemyFire(String result) throws IOException {
-        outputStream = new ObjectOutputStream(this.socket.getOutputStream());
-        result = result + " " + opponentName;
-        outputStream.writeObject(result);
-        outputStream.flush();
-        outputStream.reset();
+        return tempArray;
     }
 }

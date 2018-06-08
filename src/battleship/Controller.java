@@ -4,6 +4,7 @@ import battleship.utils.Board;
 import battleship.utils.Cell;
 import battleship.utils.IndexVault;
 import javafx.event.ActionEvent;
+import javafx.scene.Node;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -99,16 +100,24 @@ public class Controller {
     }
 
     private void getShot() throws IOException, ClassNotFoundException {
-        int[] result = clientModel.acceptFire();
-        boolean enemyResult;
-        if (yourBoard.getIndexCell(result[0], result[1]).isWithShip()) {
-            enemyResult = true;
-        } else {
-            enemyResult = false;
+        String[] result = clientModel.acceptFire();
+        int i = Integer.valueOf(result[1]);
+        int j = Integer.valueOf(result[2]);
+        Boolean bool = Boolean.valueOf(result[3]);
+        if (bool) {
+            Rectangle rectangle = (Rectangle) getNodeFromGridPane(mainView.getYourBoard(), i, j);
+            rectangle.setFill(RED);
+        }
+    }
+
+    private Node getNodeFromGridPane(GridPane gridPane, int row, int col) {
+        for (Node node : gridPane.getChildren()) {
+            if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
+                return node;
+            }
         }
 
-        String transResult = "result " + enemyResult;
-        clientModel.transferResultOfEnemyFire(transResult);
+        return null;
     }
 
     void placeShip(MouseEvent mouseEvent) {

@@ -28,6 +28,14 @@ public class MainView extends Application {
     private Label gameMessage;
     private Button startButton;
 
+    public GridPane getYourBoard() {
+        return yourBoard;
+    }
+
+    public GridPane getEnemyBoard() {
+        return enemyBoard;
+    }
+
     Label getYouLabel() {
         return youLabel;
     }
