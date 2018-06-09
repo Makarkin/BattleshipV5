@@ -39,12 +39,10 @@ public class ClientModel extends Thread {
             while (flag) {
                 LongMessage mes = (LongMessage) inputStream.readObject();
                 users = mes.getOnlineUsers();//если юзеров нет - то это ответ на запрос.
-                if (users.length > 0) {
+                ChooseUser chooseUser = new ChooseUser(users, controller, outputStream);
+                if (users != null) {
                     showUser(users);
-                    chooseUser(users);
-                    if (request != "") {
-                        outputStream.writeObject(new LongMessage(request));
-                    }
+                    chooseUser.start();
                 } else {
                     String[] response = mes.getReport().split(" ");
                     String element = response[0];
@@ -73,11 +71,12 @@ public class ClientModel extends Thread {
     }
 
     private void acceptOrrejectPlayer(String[] response) throws IOException {
-        System.out.printf("Do you want to play with %s ? y/n", response[response.length]);
+        System.out.printf("Do you want to play with %s ? y/n", response[response.length - 1]);
+        System.out.println();
         Scanner scanner = new Scanner(System.in);
         String s = scanner.nextLine().toLowerCase();
         if ("y".equals(s)) {
-            opponentName = response[response.length];
+            opponentName = response[response.length - 1];
             outputStream.writeObject(new LongMessage("y"));
         } else {
             outputStream.writeObject(new LongMessage("n"));
@@ -129,7 +128,7 @@ public class ClientModel extends Thread {
         String[] tempArray = new String[2];
         tempArray[0] = response[1];
         tempArray[1] = response[2];
-        if (Boolean.valueOf(response[response.length])) {
+        if (Boolean.valueOf(response[response.length - 1])) {
             controller.acceptResult(tempArray);
         }
 
@@ -140,7 +139,7 @@ public class ClientModel extends Thread {
         String[] tempArray = new String[2];
         tempArray[0] = enemyFire[1];
         tempArray[1] = enemyFire[2];
-        if (Boolean.valueOf(enemyFire[enemyFire.length])) {
+        if (Boolean.valueOf(enemyFire[enemyFire.length - 1])) {
             controller.getShot(tempArray);
         } else {
             controller.getShotPast(tempArray);
