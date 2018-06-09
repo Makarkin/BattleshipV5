@@ -7,10 +7,8 @@ import intermediateServer.utils.UsersList;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
 
 public class Server extends Thread {
 
@@ -40,11 +38,11 @@ public class Server extends Thread {
                 System.out.println("Waiting connection on port:" + this.port);
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("New client connected to server");
-                CountDownLatch latch = new CountDownLatch(1);
-                ServerClientSession clientSession = new ServerClientSession(clientSocket, latch);
-                latch.await();
-
-                for (String request : requestList) {
+                ServerClientSession clientSession = new ServerClientSession(clientSocket);
+                /*latch.await();*/
+                System.out.println("requestListSize " + requestList.size());
+                if (requestList.size() > 0) {
+                    String request = requestList.poll();
                     String[] requestBody = request.split(" ");
                     if ("fire".equals(requestBody[0])) {
                         fireMethod(requestBody);
@@ -53,9 +51,11 @@ public class Server extends Thread {
                     }
                 }
             }
-        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+        } catch (IOException /*| InterruptedException */| ClassNotFoundException e) {
             e.printStackTrace();
-        }
+        } /*catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
     }
 
     private void requestMethod(String[] requestBody) throws IOException, ClassNotFoundException {
