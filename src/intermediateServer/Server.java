@@ -39,7 +39,7 @@ public class Server extends Thread {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("New client connected to server");
                 ServerClientSession clientSession = new ServerClientSession(clientSocket);
-                /*latch.await();*/
+              
                 System.out.println("requestListSize " + requestList.size());
                 if (requestList.size() > 0) {
                     String request = requestList.poll();
@@ -51,11 +51,9 @@ public class Server extends Thread {
                     }
                 }
             }
-        } catch (IOException /*| InterruptedException */| ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
-        } /*catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
+        } 
     }
 
     private void requestMethod(String[] requestBody) throws IOException, ClassNotFoundException {
