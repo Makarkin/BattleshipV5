@@ -16,22 +16,26 @@ public class PoolRequestHandler extends Thread {
 
     @Override
     public void run() {
+        System.out.println("requestHandler was started");
         while (true) {
-            String request = poolRequest.poll();
-            String[] requestBody = request.split(" ");
-            if ("fire".equals(requestBody[0])) {
-                try {
-                    fireMethod(requestBody);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else if ("request".equals(requestBody[0])) {
-                try {
-                    requestMethod(requestBody);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+            if (poolRequest.size() > 0) {
+                String request = poolRequest.poll();
+                System.out.println(request + " in handler");
+                String[] requestBody = request.split(" ");
+                if ("fire".equals(requestBody[0])) {
+                    try {
+                        fireMethod(requestBody);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else if ("request".equals(requestBody[0])) {
+                    try {
+                        requestMethod(requestBody);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

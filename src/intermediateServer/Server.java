@@ -18,7 +18,7 @@ public class Server extends Thread {
     private static UsersList usersList = new UsersList();
     private static ArrayBlockingQueue<String> requestList = new ArrayBlockingQueue<>(10);
 
-    private PoolRequestHandler requestHandler;
+    private PoolRequestHandler requestHandler = null;
 
     public synchronized static BlockingQueue<String> getRequestList() {
         return requestList;
@@ -30,6 +30,9 @@ public class Server extends Thread {
 
     Server(int port) {
         this.port = port;
+        requestHandler = new PoolRequestHandler(requestList);
+        System.out.println("requestPool was created");
+        requestHandler.start();
     }
 
     @Override
@@ -42,13 +45,6 @@ public class Server extends Thread {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("New client connected to server");
                 ServerClientSession clientSession = new ServerClientSession(clientSocket);
-                if (requestList == null) {
-                     requestHandler = new PoolRequestHandler(requestList);
-                }
-
-                if (requestList.size() > 0) {
-                    requestHandler.start();
-                }
             }
         } catch (IOException e) {
             e.printStackTrace();

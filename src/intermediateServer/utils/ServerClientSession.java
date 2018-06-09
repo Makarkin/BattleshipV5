@@ -38,10 +38,9 @@ public class ServerClientSession extends Thread {
             this.longMessage.setOnlineUsers(Server.getUserList().getUsersName());
             this.broadcast(Server.getUserList().getClientsList(), this.longMessage);
 
-            /*latch.countDown();*/
-
             while (flag) {
                 request = ((LongMessage) inputStream.readObject()).getReport();
+                System.out.println(request + " in client session");
                 if (request != "") {
                     Server.getRequestList().add(this.request);
                 }

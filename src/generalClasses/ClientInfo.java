@@ -14,6 +14,8 @@ public class ClientInfo implements Serializable {
     private ObjectInputStream inputStream;
     private Board board;
     private Boolean isBusy = false;
+    private int wins = 0;
+    private int lose = 0;
 
     public void setBusy(Boolean busy) {
         isBusy = busy;
