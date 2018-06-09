@@ -42,7 +42,6 @@ public class ServerClientSession extends Thread {
 
             while (flag) {
                 request = ((LongMessage) inputStream.readObject()).getReport();
-                System.out.println(request);
                 if (request != "") {
                     Server.getRequestList().add(this.request);
                 }
