@@ -89,8 +89,8 @@ public class Controller {
     void acceptResult(String[] result) {
         int i = Integer.valueOf(result[0]);
         int j = Integer.valueOf(result[1]);
-        System.out.println(mainView.getEnemyBoard().getChildren());
-        Rectangle rectangle = (Rectangle) getNodeFromGridPane(mainView.getEnemyBoard(), i, j);
+        System.out.println(i+" "+j +" "+ "yor fire result");
+        Rectangle rectangle = (Rectangle) mainView.getEnemyBoard().getChildren().get(i+j*10+1);
         rectangle.setFill(RED);
         enemySumOfDecks--;
         if (enemySumOfDecks == 0) {
@@ -99,34 +99,35 @@ public class Controller {
         }
     }
 
+    public void acceptFalseResult(String[] result) {
+        int i = Integer.valueOf(result[0]);
+        int j = Integer.valueOf(result[1]);
+        System.out.println(i+" "+j +" "+ "yor false fire result");
+        Rectangle rectangle = (Rectangle) mainView.getEnemyBoard().getChildren().get(i+j*10+1);
+        rectangle.setFill(BLACK);
+    }
+
      void getShot(String[] result) {
+         yourTurn = true;
          int i = Integer.valueOf(result[0]);
          int j = Integer.valueOf(result[1]);
-         Rectangle rectangle = (Rectangle) getNodeFromGridPane(mainView.getYourBoard(), i, j);
+         System.out.println(i+" "+j +" "+ "enemy fire result");
+         Rectangle rectangle = (Rectangle) mainView.getYourBoard().getChildren().get(i+j*10+1);
          rectangle.setFill(RED);
          yourSumOfDecks--;
          if (yourSumOfDecks == 0) {
              mainView.getGameMessage().setText("You lose!");
              clientModel.transferLoseMessage();
-             yourTurn = true;
          }
      }
 
     void getShotPast(String[] result) {
+        yourTurn = true;
         int i = Integer.valueOf(result[0]);
         int j = Integer.valueOf(result[1]);
-        Rectangle rectangle = (Rectangle) mainView.getYourBoard().getChildren().get(i*10+j);
+        System.out.println(i+" "+j +" "+ "enemy past fire result");
+        Rectangle rectangle = (Rectangle) mainView.getYourBoard().getChildren().get(i+j*10+1);
         rectangle.setFill(BLACK);
-    }
-
-    private Node getNodeFromGridPane(GridPane gridPane, int row, int col) {
-        for (Node node : gridPane.getChildren()) {
-            if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
-                return node;
-            }
-        }
-
-        return null;
     }
 
     void placeShip(MouseEvent mouseEvent) {

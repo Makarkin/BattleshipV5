@@ -103,6 +103,8 @@ public class ClientModel extends Thread {
         tempArray[1] = response[2];
         if (Boolean.valueOf(response[response.length - 1])) {
             controller.acceptResult(tempArray);
+        } else {
+            controller.acceptFalseResult(tempArray);
         }
     }
 
