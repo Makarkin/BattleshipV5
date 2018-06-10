@@ -45,13 +45,17 @@ public class PoolRequestHandler extends Thread {
         String requestTo = requestBody[1];
         String requestFrom = requestBody[2];
         String request = String.format("Do you want to play with %s", requestFrom);
+        Server.logger.info("Request sent to the player " + requestTo + " from " + requestFrom);
         Server.getUserList().getUsers().get(requestTo).getThisObjectOutputStream().writeObject(new LongMessage(request));
         LongMessage response = (LongMessage) Server.getUserList().getUsers().get(requestTo).getThisObjectInputStream().readObject();
+        Server.logger.info("Received a response from " + requestFrom + " from " + requestTo);
         if ("y".equals(response.getReport())) {
+            Server.logger.info("Response is consent");
             Server.getUserList().getUsers().get(requestFrom).setBusy(true);
             Server.getUserList().getUsers().get(requestTo).setBusy(true);
             Server.getUserList().getUsers().get(requestFrom).getThisObjectOutputStream().writeObject(new LongMessage("y " + requestTo));
         } else {
+            Server.logger.info("Response is failure");
             Server.getUserList().getUsers().get(requestFrom).getThisObjectOutputStream().writeObject(new LongMessage("n"));
         }
     }
@@ -64,15 +68,19 @@ public class PoolRequestHandler extends Thread {
         String resultForShooter;
         String resultForUnderFire;
         if (Server.getUserList().getUsers().get(fireToName).getBoard().getIndexCell(i, j).isWithShip()) {
+            Server.logger.info("Fire from " + fireFromName + " to " + fireToName + " is successful");
             resultForShooter = String.format("yourResult %s %s true", i, j);
             resultForUnderFire = String.format("enemyResult %s %s true", i, j);
             Server.getUserList().getUsers().get(fireToName).getThisObjectOutputStream().writeObject(new LongMessage(resultForUnderFire));
             Server.getUserList().getUsers().get(fireFromName).getThisObjectOutputStream().writeObject(new LongMessage(resultForShooter));
+            Server.logger.info("Result of fire sent to " + fireFromName + " and " + fireToName);
         } else {
+            Server.logger.info("Fire from " + fireFromName + " to " + fireToName + " is a failure");
             resultForShooter = String.format("yourResult %s %s false", i, j);
             resultForUnderFire = String.format("enemyResult %s %s false", i, j);
             Server.getUserList().getUsers().get(fireToName).getThisObjectOutputStream().writeObject(new LongMessage(resultForUnderFire));
             Server.getUserList().getUsers().get(fireFromName).getThisObjectOutputStream().writeObject(new LongMessage(resultForShooter));
+            Server.logger.info("Result of fire sent to " + fireFromName + " and " + fireToName);
         }
     }
 }

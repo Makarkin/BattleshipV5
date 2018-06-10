@@ -18,7 +18,7 @@ public class Server extends Thread {
 
     PoolRequestHandler poolRequestHandler;
 
-    private final static Logger logger = Logger.getLogger(Server.class);
+    public final static Logger logger = Logger.getLogger(Server.class);
     private static UsersList usersList = new UsersList();
     private static ArrayBlockingQueue<String> requestList = new ArrayBlockingQueue<>(10);
 
@@ -49,65 +49,10 @@ public class Server extends Thread {
                 logger.info("New client connected to server");
                 ServerClientSession clientSession = new ServerClientSession(clientSocket);
                 logger.info("New client session is create");
-                System.out.println("requestListSize " + requestList.size());
-                if (requestList.size() > 0) {
-                    String request = requestList.poll();
-                    String[] requestBody = request.split(" ");
-                    if ("fire".equals(requestBody[0])) {
-                        fireMethod(requestBody);
-                        logger.info("Fire method started");
-                    } else if ("request".equals(requestBody[0])) {
-                        requestMethod(requestBody);
-                        logger.info("Request method started");
-                    }
-                }
             }
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             logger.error("Exception", e);
             e.printStackTrace();
-        }
-    }
-
-    private void requestMethod(String[] requestBody) throws IOException, ClassNotFoundException {
-        String requestTo = requestBody[1];
-        String requestFrom = requestBody[2];
-        String request = String.format("Do you want to play with %s?", requestFrom);
-        usersList.getUsers().get(requestTo).getThisObjectOutputStream().writeObject(new LongMessage(request));
-        logger.info("Request sent to the player " + requestTo + " from " + requestFrom);
-        LongMessage response = (LongMessage) usersList.getUsers().get(requestTo).getThisObjectInputStream().readObject();
-        logger.info("Received a response from " + requestFrom + " from " + requestTo);
-        if ("y".equals(response.getReport())) {
-            logger.info("Response is consent");
-            usersList.getUsers().get(requestFrom).setBusy(true);
-            usersList.getUsers().get(requestTo).setBusy(true);
-            usersList.getUsers().get(requestFrom).getThisObjectOutputStream().writeObject(new LongMessage("y " + requestTo));
-        } else {
-            logger.info("Response is failure");
-            usersList.getUsers().get(requestFrom).getThisObjectOutputStream().writeObject(new LongMessage("n"));
-        }
-    }
-
-    private void fireMethod(String[] requestBody) throws IOException {
-        int i = Integer.valueOf(requestBody[1]);
-        int j = Integer.valueOf(requestBody[2]);
-        String fireToName = requestBody[3];
-        String fireFromName = requestBody[4];
-        String resultForShooter;
-        String resultForUnderFire;
-        if (usersList.getUsers().get(fireToName).getBoard().getIndexCell(i, j).isWithShip()) {
-            logger.info("Fire from " + fireFromName + " to " + fireToName + " is successful");
-            resultForShooter = String.format("yourResult %s %s true", i, j);
-            resultForUnderFire = String.format("enemyResult %s %s true", i, j);
-            usersList.getUsers().get(fireToName).getThisObjectOutputStream().writeObject(new LongMessage(resultForUnderFire));
-            usersList.getUsers().get(fireFromName).getThisObjectOutputStream().writeObject(new LongMessage(resultForShooter));
-            logger.info("Result of fire sent to " + fireFromName + " and " + fireToName);
-        } else {
-            logger.info("Fire from " + fireFromName + " to " + fireToName + " is a failure");
-            resultForShooter = String.format("yourResult %s %s false", i, j);
-            resultForUnderFire = String.format("enemyResult %s %s false", i, j);
-            usersList.getUsers().get(fireToName).getThisObjectOutputStream().writeObject(new LongMessage(resultForUnderFire));
-            usersList.getUsers().get(fireFromName).getThisObjectOutputStream().writeObject(new LongMessage(resultForShooter));
-            logger.info("Result of fire sent to " + fireFromName + " and " + fireToName);
         }
     }
 }

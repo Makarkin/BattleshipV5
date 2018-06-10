@@ -75,7 +75,7 @@ public class Controller {
         }
     }
 
-    void makeShot(MouseEvent mouseEvent) throws IOException, ClassNotFoundException {
+    void makeShot(MouseEvent mouseEvent) throws IOException {
         if (yourTurn) {
             yourTurn = false;
             Rectangle rectangle = (Rectangle) mouseEvent.getSource();

@@ -66,8 +66,6 @@ public class MainView extends Application {
                     controller.makeShot(e);
                 } catch (IOException e1) {
                     e1.printStackTrace();
-                } catch (ClassNotFoundException e1) {
-                    e1.printStackTrace();
                 }
             });
         }

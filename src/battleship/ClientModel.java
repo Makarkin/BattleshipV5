@@ -17,7 +17,6 @@ public class ClientModel extends Thread {
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
     private String opponentName;
-    private String request;
 
     ClientModel(Controller controller) throws IOException {
         InetAddress address = InetAddress.getByName(controller.getIntrServerAddress());
