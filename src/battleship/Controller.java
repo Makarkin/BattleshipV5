@@ -67,7 +67,7 @@ public class Controller {
     }
 
     void start(ActionEvent actionEvent) throws IOException {
-        if (numberOfShipsOnBoard == 10) {
+        if (numberOfShipsOnBoard == 1) {enemySumOfDecks = 4;
         System.out.println("Start");
         this.clientModel = new ClientModel(this);
         this.clientModel.start();
@@ -89,12 +89,12 @@ public class Controller {
     void acceptResult(String[] result) {
         int i = Integer.valueOf(result[0]);
         int j = Integer.valueOf(result[1]);
-        System.out.println(i+" "+j +" "+ "yor fire result");
         Rectangle rectangle = (Rectangle) mainView.getEnemyBoard().getChildren().get(i+j*10+1);
         rectangle.setFill(RED);
         enemySumOfDecks--;
         if (enemySumOfDecks == 0) {
-            mainView.getGameMessage().setText("You win!");
+            //mainView.getGameMessage().setText("You win!");
+            System.out.println("You win!");
             clientModel.transferVictoryMessage();
         }
     }
@@ -102,7 +102,6 @@ public class Controller {
     public void acceptFalseResult(String[] result) {
         int i = Integer.valueOf(result[0]);
         int j = Integer.valueOf(result[1]);
-        System.out.println(i+" "+j +" "+ "yor false fire result");
         Rectangle rectangle = (Rectangle) mainView.getEnemyBoard().getChildren().get(i+j*10+1);
         rectangle.setFill(BLACK);
     }
@@ -111,12 +110,12 @@ public class Controller {
          yourTurn = true;
          int i = Integer.valueOf(result[0]);
          int j = Integer.valueOf(result[1]);
-         System.out.println(i+" "+j +" "+ "enemy fire result");
          Rectangle rectangle = (Rectangle) mainView.getYourBoard().getChildren().get(i+j*10+1);
          rectangle.setFill(RED);
          yourSumOfDecks--;
          if (yourSumOfDecks == 0) {
-             mainView.getGameMessage().setText("You lose!");
+             //mainView.getGameMessage().setText("You lose!");
+             System.out.println("You lose!");
              clientModel.transferLoseMessage();
          }
      }
@@ -125,7 +124,6 @@ public class Controller {
         yourTurn = true;
         int i = Integer.valueOf(result[0]);
         int j = Integer.valueOf(result[1]);
-        System.out.println(i+" "+j +" "+ "enemy past fire result");
         Rectangle rectangle = (Rectangle) mainView.getYourBoard().getChildren().get(i+j*10+1);
         rectangle.setFill(BLACK);
     }
@@ -214,7 +212,11 @@ public class Controller {
         counterOfDeck = 0;
         freezeCell(itShouldFrozen, yourBoard);
         itShouldFrozen.clear();
+        if (10 - numberOfShipsOnBoard > 0) {
         mainView.getGameMessage().setText("You have left to place " + (10 - numberOfShipsOnBoard) + " ships");
+        } else { mainView.getGameMessage().setText("Press start");
+        }
+
     }
 
     private static boolean checkVerticalShipPlaceConstraint(int rowCounter, int columnCounter, Integer predI, Integer predJ) {
