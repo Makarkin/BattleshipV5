@@ -38,7 +38,7 @@ public class ClientModel extends Thread {
             inputStream = new ObjectInputStream(this.socket.getInputStream());
             while (flag) {
                 LongMessage mes = (LongMessage) inputStream.readObject();
-                users = mes.getOnlineUsers();//если юзеров нет - то это ответ на запрос.
+                users = mes.getOnlineUsers();
                 ChooseUser chooseUser = new ChooseUser(users, controller, outputStream);
                 if (users != null) {
                     showUser(users);
@@ -81,24 +81,6 @@ public class ClientModel extends Thread {
         }
     }
 
-    private void chooseUser(String[] users) {
-        System.out.println("Choose number of your opponent. For refresh opponents list enter \"r\" ");
-        Scanner scanner = new Scanner(System.in);
-        int index;
-        String s = scanner.nextLine().toLowerCase();
-        if ("r".equals(s)) {
-            return;
-        } else {
-            index = Integer.valueOf(s);
-            String[] result = users[index].split(" ");
-            if (!Boolean.valueOf(result[1])) {
-                 request = "request " + result[0] + " " + controller.getMainView().getYouLabel().getText();
-            } else {
-                return;
-            }
-        }
-    }
-
     private void showUser(String[] users) {
         Date date = new Date();
 
@@ -119,17 +101,16 @@ public class ClientModel extends Thread {
         outputStream.flush();
     }
 
-    private void acceptResultOfYourFire(String[] response) throws IOException {
+    private void acceptResultOfYourFire(String[] response) {
         String[] tempArray = new String[2];
         tempArray[0] = response[1];
         tempArray[1] = response[2];
         if (Boolean.valueOf(response[response.length - 1])) {
             controller.acceptResult(tempArray);
         }
-
     }
 
-    private void acceptFire(String[] enemyFire) throws IOException {
+    private void acceptFire(String[] enemyFire) {
         String[] tempArray = new String[2];
         tempArray[0] = enemyFire[1];
         tempArray[1] = enemyFire[2];
