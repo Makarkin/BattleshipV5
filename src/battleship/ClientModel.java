@@ -26,7 +26,6 @@ public class ClientModel extends Thread {
 
     @Override
     public void run() {
-        Controller.yourTurn = true;
         boolean flag = true;
         try {
             String[] users;
@@ -47,7 +46,6 @@ public class ClientModel extends Thread {
                     String element = response[0];
                     if ("y".equals(element)) {
                         opponentName = response[1];
-                        controller.getMainView().getEnemyLabel().setText(opponentName);
                     } else if ("n".equals(element)) {
                         return;
                     } else if ("enemyResult".equals(element)) {
@@ -72,6 +70,7 @@ public class ClientModel extends Thread {
         System.out.println();
         String s = "y"/*scanner.nextLine()*/;
         if ("y".equals(s)) {
+            controller.setYourTurn(true);
             opponentName = response[response.length - 1];
             outputStream.writeObject(new LongMessage("y " + opponentName + " " + controller.getMainView().getYouLabel().getText()));
         } else {
@@ -95,9 +94,7 @@ public class ClientModel extends Thread {
 
     void transferFire(String fireCoordinates) throws IOException {
         fireCoordinates += String.format(" %s %s", opponentName, controller.getMainView().getYouLabel().getText());
-        outputStream = new ObjectOutputStream(this.socket.getOutputStream());
         outputStream.writeObject(fireCoordinates);
-        outputStream.flush();
     }
 
     private void acceptResultOfYourFire(String[] response) {

@@ -40,8 +40,8 @@ public class Controller {
     private Board yourBoard = new Board();
     static boolean yourTurn = false;
 
-    public static void setYourTurn(boolean yourTurn) {
-        Controller.yourTurn = yourTurn;
+    public void setYourTurn(boolean yourTurn) {
+        this.yourTurn = yourTurn;
     }
 
     public int getPort() {
@@ -71,7 +71,6 @@ public class Controller {
         System.out.println("Start");
         this.clientModel = new ClientModel(this);
         this.clientModel.start();
-        yourTurn = true;
         }
     }
 
@@ -108,6 +107,7 @@ public class Controller {
          if (yourSumOfDecks == 0) {
              mainView.getGameMessage().setText("You lose!");
              clientModel.transferLoseMessage();
+             yourTurn = true;
          }
      }
 

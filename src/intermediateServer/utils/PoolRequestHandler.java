@@ -74,7 +74,7 @@ public class PoolRequestHandler extends Thread {
         Server.logger.info("Response is consent");
         Server.getUserList().getUsers().get(responseFrom).setBusy(true);
         Server.getUserList().getUsers().get(responseTo).setBusy(true);
-        Server.getUserList().getUsers().get(responseTo).getThisObjectOutputStream().writeObject(new LongMessage("y " + responseTo));
+        Server.getUserList().getUsers().get(responseTo).getThisObjectOutputStream().writeObject(new LongMessage("y " + responseFrom));
     }
 
     private void fireMethod(String[] requestBody) throws IOException {
