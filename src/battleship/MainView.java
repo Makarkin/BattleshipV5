@@ -52,8 +52,8 @@ public class MainView extends Application {
         gridPane.setGridLinesVisible(true);
         gridPane.setHgap(1);
         gridPane.setVgap(1);
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
+        for (int i = 0; i <= 9; i++) {
+            for (int j = 0; j <= 9; j++) {
                 gridPane.add(new Rectangle(30, 30, Color.LIGHTGREY), i, j);
             }
         }

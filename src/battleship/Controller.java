@@ -67,7 +67,7 @@ public class Controller {
     }
 
     void start(ActionEvent actionEvent) throws IOException {
-        if (numberOfShipsOnBoard == 0) {
+        if (numberOfShipsOnBoard == 10) {
         System.out.println("Start");
         this.clientModel = new ClientModel(this);
         this.clientModel.start();
@@ -89,6 +89,7 @@ public class Controller {
     void acceptResult(String[] result) {
         int i = Integer.valueOf(result[0]);
         int j = Integer.valueOf(result[1]);
+        System.out.println(mainView.getEnemyBoard().getChildren());
         Rectangle rectangle = (Rectangle) getNodeFromGridPane(mainView.getEnemyBoard(), i, j);
         rectangle.setFill(RED);
         enemySumOfDecks--;
@@ -114,7 +115,7 @@ public class Controller {
     void getShotPast(String[] result) {
         int i = Integer.valueOf(result[0]);
         int j = Integer.valueOf(result[1]);
-        Rectangle rectangle = (Rectangle) getNodeFromGridPane(mainView.getYourBoard(), i, j);
+        Rectangle rectangle = (Rectangle) mainView.getYourBoard().getChildren().get(i*10+j);
         rectangle.setFill(BLACK);
     }
 

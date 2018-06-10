@@ -94,7 +94,7 @@ public class ClientModel extends Thread {
 
     void transferFire(String fireCoordinates) throws IOException {
         fireCoordinates += String.format(" %s %s", opponentName, controller.getMainView().getYouLabel().getText());
-        outputStream.writeObject(fireCoordinates);
+        outputStream.writeObject(new LongMessage(fireCoordinates));
     }
 
     private void acceptResultOfYourFire(String[] response) {
