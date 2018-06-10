@@ -73,9 +73,9 @@ public class ClientModel extends Thread {
         String s = "y"/*scanner.nextLine()*/;
         if ("y".equals(s)) {
             opponentName = response[response.length - 1];
-            outputStream.writeObject(new LongMessage("y"));
+            outputStream.writeObject(new LongMessage("y " + opponentName + " " + controller.getMainView().getYouLabel().getText()));
         } else {
-            outputStream.writeObject(new LongMessage("n"));
+            outputStream.writeObject(new LongMessage("n " + response[response.length - 1] + " " + controller.getMainView().getYouLabel().getText()));
             return;
         }
     }

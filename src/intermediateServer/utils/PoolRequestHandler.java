@@ -36,28 +36,45 @@ public class PoolRequestHandler extends Thread {
                     } catch (ClassNotFoundException e) {
                         e.printStackTrace();
                     }
+                } else if ("y".equals(requestBody[0])) {
+                    try {
+                        responseMethod(requestBody);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else if ("n".equals(requestBody[0])) {
+                    try {
+                        notResponseMethod(requestBody);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
+    }
+
+    private void notResponseMethod(String[] requestBody) throws IOException {
+        Server.logger.info("Response is failure");
+        String responseTo = requestBody[1];
+        Server.getUserList().getUsers().get(responseTo).getThisObjectOutputStream().writeObject(new LongMessage("n"));
     }
 
     private void requestMethod(String[] requestBody) throws IOException, ClassNotFoundException {
         String requestTo = requestBody[1];
         String requestFrom = requestBody[2];
         String request = String.format("Do you want to play with %s", requestFrom);
-        Server.logger.info("Request sent to the player " + requestTo + " from " + requestFrom);
         Server.getUserList().getUsers().get(requestTo).getThisObjectOutputStream().writeObject(new LongMessage(request));
-        LongMessage response = (LongMessage) Server.getUserList().getUsers().get(requestTo).getThisObjectInputStream().readObject();
-        Server.logger.info("Received a response from " + requestFrom + " from " + requestTo);
-        if ("y".equals(response.getReport())) {
-            Server.logger.info("Response is consent");
-            Server.getUserList().getUsers().get(requestFrom).setBusy(true);
-            Server.getUserList().getUsers().get(requestTo).setBusy(true);
-            Server.getUserList().getUsers().get(requestFrom).getThisObjectOutputStream().writeObject(new LongMessage("y " + requestTo));
-        } else {
-            Server.logger.info("Response is failure");
-            Server.getUserList().getUsers().get(requestFrom).getThisObjectOutputStream().writeObject(new LongMessage("n"));
-        }
+        Server.logger.info("Request sent to the player " + requestTo + " from " + requestFrom);
+    }
+
+    private void responseMethod(String[] requestBody) throws IOException {
+        String responseTo = requestBody[1];
+        String responseFrom = requestBody[2];
+        Server.logger.info("Received a response from " + responseFrom + " for " + responseTo);
+        Server.logger.info("Response is consent");
+        Server.getUserList().getUsers().get(responseFrom).setBusy(true);
+        Server.getUserList().getUsers().get(responseTo).setBusy(true);
+        Server.getUserList().getUsers().get(responseTo).getThisObjectOutputStream().writeObject(new LongMessage("y " + responseTo));
     }
 
     private void fireMethod(String[] requestBody) throws IOException {
