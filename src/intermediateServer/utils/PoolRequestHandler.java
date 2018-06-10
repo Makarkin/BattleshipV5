@@ -44,7 +44,7 @@ public class PoolRequestHandler extends Thread {
     private void requestMethod(String[] requestBody) throws IOException, ClassNotFoundException {
         String requestTo = requestBody[1];
         String requestFrom = requestBody[2];
-        String request = String.format("Do you want to play with %s?", requestFrom);
+        String request = String.format("Do you want to play with %s", requestFrom);
         Server.getUserList().getUsers().get(requestTo).getThisObjectOutputStream().writeObject(new LongMessage(request));
         LongMessage response = (LongMessage) Server.getUserList().getUsers().get(requestTo).getThisObjectInputStream().readObject();
         if ("y".equals(response.getReport())) {

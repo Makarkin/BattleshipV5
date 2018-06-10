@@ -67,7 +67,7 @@ public class Controller {
     }
 
     void start(ActionEvent actionEvent) throws IOException {
-        if (numberOfShipsOnBoard == 0) {
+        if (numberOfShipsOnBoard == 10) {
         System.out.println("Start");
         this.clientModel = new ClientModel(this);
         this.clientModel.start();

@@ -56,13 +56,10 @@ public class ClientModel extends Thread {
                     } else if ("yourResult".equals(element)) {
                         acceptResultOfYourFire(response);
                     } else if ("Do".equals(element)) {
-                        acceptOrrejectPlayer(response);
+                        acceptOrRejectPlayer(response);
                     }
                 }
             }
-
-            outputStream.reset();
-            inputStream.reset();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -70,11 +67,11 @@ public class ClientModel extends Thread {
         }
     }
 
-    private void acceptOrrejectPlayer(String[] response) throws IOException {
-        System.out.printf("Do you want to play with %s ? y/n", response[response.length - 1]);
-        System.out.println();
+    private void acceptOrRejectPlayer(String[] response) throws IOException {
         Scanner scanner = new Scanner(System.in);
-        String s = scanner.nextLine().toLowerCase();
+        System.out.printf("Do you want to play with %s y/n", response[response.length - 1]);
+        System.out.println();
+        String s = "y"/*scanner.nextLine()*/;
         if ("y".equals(s)) {
             opponentName = response[response.length - 1];
             outputStream.writeObject(new LongMessage("y"));
@@ -111,7 +108,6 @@ public class ClientModel extends Thread {
             info = users[i].split(" ");
             if (!controller.getMainView().getYouLabel().getText().equals(info[0])) {
                 System.out.println("Number of player: " + i + "; Name: " + info[0] + "; Is busy: " + info[1]);
-
             }
         }
     }
@@ -121,10 +117,9 @@ public class ClientModel extends Thread {
         outputStream = new ObjectOutputStream(this.socket.getOutputStream());
         outputStream.writeObject(fireCoordinates);
         outputStream.flush();
-        outputStream.reset();
     }
 
-    private void acceptResultOfYourFire(String[] response) throws IOException, ClassNotFoundException {
+    private void acceptResultOfYourFire(String[] response) throws IOException {
         String[] tempArray = new String[2];
         tempArray[0] = response[1];
         tempArray[1] = response[2];
@@ -132,10 +127,9 @@ public class ClientModel extends Thread {
             controller.acceptResult(tempArray);
         }
 
-        inputStream.reset();
     }
 
-    private void acceptFire(String[] enemyFire) throws IOException, ClassNotFoundException {
+    private void acceptFire(String[] enemyFire) throws IOException {
         String[] tempArray = new String[2];
         tempArray[0] = enemyFire[1];
         tempArray[1] = enemyFire[2];
@@ -144,8 +138,6 @@ public class ClientModel extends Thread {
         } else {
             controller.getShotPast(tempArray);
         }
-
-        inputStream.reset();
     }
 
     void transferLoseMessage() {
