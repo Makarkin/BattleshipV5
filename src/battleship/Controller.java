@@ -3,6 +3,7 @@ package battleship;
 import battleship.utils.Board;
 import battleship.utils.Cell;
 import battleship.utils.IndexVault;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.input.MouseButton;
@@ -67,7 +68,9 @@ public class Controller {
     }
 
     void start(ActionEvent actionEvent) throws IOException {
-        if (numberOfShipsOnBoard == 1) {enemySumOfDecks = 4;
+        if (numberOfShipsOnBoard == 1) {
+            enemySumOfDecks = 4;
+            yourSumOfDecks = 4;
         System.out.println("Start");
         this.clientModel = new ClientModel(this);
         this.clientModel.start();
@@ -93,8 +96,7 @@ public class Controller {
         rectangle.setFill(RED);
         enemySumOfDecks--;
         if (enemySumOfDecks == 0) {
-            //mainView.getGameMessage().setText("You win!");
-            System.out.println("You win!");
+            Platform.runLater(() -> mainView.getGameMessage().setText("You win!"));
             clientModel.transferVictoryMessage();
         }
     }
@@ -114,8 +116,7 @@ public class Controller {
          rectangle.setFill(RED);
          yourSumOfDecks--;
          if (yourSumOfDecks == 0) {
-             //mainView.getGameMessage().setText("You lose!");
-             System.out.println("You lose!");
+             Platform.runLater(()-> mainView.getGameMessage().setText("You lose!"));
              clientModel.transferLoseMessage();
          }
      }

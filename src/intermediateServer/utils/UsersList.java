@@ -20,14 +20,14 @@ public class UsersList {
 
         if (!this.onlineUsers.containsKey(nickname)) {
             this.onlineUsers.put(nickname, new ClientInfo(socket, outputStream, inputStream, board));
-        } else {
+        } /*else {
             int i = 1;
             while (this.onlineUsers.containsKey(nickname)) {
                 nickname = nickname + i;
                 i++;
             }
             this.onlineUsers.put(nickname, new ClientInfo(socket, outputStream, inputStream, board));
-        }
+        }*/
     }
 
     public void deleteUser(String nickname) {
@@ -57,7 +57,6 @@ public class UsersList {
 
     public ArrayList<ClientInfo> getClientsList() {
         ArrayList<ClientInfo> clientsList = new ArrayList<ClientInfo>(this.onlineUsers.entrySet().size());
-
         String s = "";
         for (Map.Entry<String, ClientInfo> m : this.onlineUsers.entrySet()) {
             clientsList.add(m.getValue());
