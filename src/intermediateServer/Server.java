@@ -1,10 +1,8 @@
 package intermediateServer;
 
-import generalClasses.LongMessage;
 import intermediateServer.utils.PoolRequestHandler;
 import intermediateServer.utils.ServerClientSession;
 import intermediateServer.utils.UsersList;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -16,8 +14,6 @@ import java.util.concurrent.BlockingQueue;
 public class Server extends Thread {
 
     private int port;
-
-    PoolRequestHandler poolRequestHandler;
 
     public final static Logger logger = Logger.getLogger(Server.class);
     private static UsersList usersList = new UsersList();
@@ -33,17 +29,16 @@ public class Server extends Thread {
 
     Server(int port) {
         this.port = port;
-        poolRequestHandler = new PoolRequestHandler(requestList);
+        PoolRequestHandler poolRequestHandler = new PoolRequestHandler(requestList);
         poolRequestHandler.start();
         logger.info("New Server create");
     }
 
     @Override
     public void run() {
-        boolean flag = true;
         try {
             ServerSocket serverSocket = new ServerSocket(this.port);
-            while (flag) {
+            while (true) {
                 System.out.println("Waiting connection on port:" + this.port);
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("New client connected to server");

@@ -5,7 +5,6 @@ import battleship.utils.Cell;
 import battleship.utils.IndexVault;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.scene.Node;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -39,32 +38,32 @@ public class Controller {
     private int counterOfDeck = 0;
     private int numberOfShipsOnBoard = 0;
     private Board yourBoard = new Board();
-    static boolean yourTurn = false;
-
-    public void setYourTurn(boolean yourTurn) {
-        this.yourTurn = yourTurn;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public String getIntrServerAddress() {
-        return intrServerAddress;
-    }
-
-    public MainView getMainView() {
-        return mainView;
-    }
-
-    public Board getYourBoard() {
-        return yourBoard;
-    }
+    private static boolean yourTurn = false;
 
     Controller(String intrServerAddres, int port, MainView mainView) {
         this.port = port;
         this.intrServerAddress = intrServerAddres;
         this.mainView = mainView;
+    }
+
+    void setYourTurn(boolean yourTurn) {
+        this.yourTurn = yourTurn;
+    }
+
+    int getPort() {
+        return port;
+    }
+
+    String getIntrServerAddress() {
+        return intrServerAddress;
+    }
+
+    MainView getMainView() {
+        return mainView;
+    }
+
+    Board getYourBoard() {
+        return yourBoard;
     }
 
     void start(ActionEvent actionEvent) throws IOException {
@@ -84,6 +83,7 @@ public class Controller {
             rectangle.setFill(BLACK);
             String fireCoordinates = "fire" + " " + i + " " + j;
             clientModel.transferFire(fireCoordinates);
+            Platform.runLater(() -> getMainView().getGameMessage().setText("Enemy turn"));
         }
     }
 
@@ -99,7 +99,7 @@ public class Controller {
         }
     }
 
-    public void acceptFalseResult(String[] result) {
+    void acceptFalseResult(String[] result) {
         int i = Integer.valueOf(result[0]);
         int j = Integer.valueOf(result[1]);
         Rectangle rectangle = (Rectangle) mainView.getEnemyBoard().getChildren().get(i+j*10+1);
@@ -113,6 +113,7 @@ public class Controller {
          Rectangle rectangle = (Rectangle) mainView.getYourBoard().getChildren().get(i+j*10+1);
          rectangle.setFill(RED);
          yourSumOfDecks--;
+         Platform.runLater(() -> getMainView().getGameMessage().setText("Your turn"));
          if (yourSumOfDecks == 0) {
              Platform.runLater(()-> mainView.getGameMessage().setText("You lose!"));
              clientModel.transferLoseMessage();

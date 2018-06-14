@@ -3,9 +3,7 @@ package battleship;
 import generalClasses.LongMessage;
 import javafx.application.Platform;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Date;
@@ -15,7 +13,6 @@ public class ClientModel extends Thread {
 
     private Controller controller;
     private Socket socket;
-    private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
     private String opponentName;
     private String yourName;
@@ -29,41 +26,45 @@ public class ClientModel extends Thread {
 
     @Override
     public void run() {
-        boolean flag = true;
-        try {
+        String fileLogName = String.format("%sBattleLog.txt", yourName);
+        try (PrintWriter printWriter = new PrintWriter(new FileOutputStream(fileLogName, true))) {
             String[] users;
-            LongMessage longMessage = new LongMessage(controller.getMainView().getYouLabel().getText(), controller.getYourBoard());
+            LongMessage longMessage = new LongMessage(yourName, controller.getYourBoard());
             outputStream = new ObjectOutputStream(this.socket.getOutputStream());
             outputStream.writeObject(longMessage);
-
-            inputStream = new ObjectInputStream(this.socket.getInputStream());
-            while (flag) {
-                LongMessage mes = (LongMessage) inputStream.readObject();
-                users = mes.getOnlineUsers();
+            ObjectInputStream inputStream = new ObjectInputStream(this.socket.getInputStream());
+            printWriter.println("Battle started");
+            while (true) {
+                LongMessage message = (LongMessage) inputStream.readObject();
+                users = message.getOnlineUsers();
                 ChooseUser chooseUser = new ChooseUser(users, controller, outputStream);
                 if (users != null) {
                     showUser(users);
                     chooseUser.start();
+                    printWriter.println("Selecting an opponent");
                 } else {
-                    String[] response = mes.getReport().split(" ");
+                    String[] response = message.getReport().split(" ");
                     String element = response[0];
                     if ("y".equals(element)) {
                         opponentName = response[1];
+                        printWriter.printf("Opponent selected. It is %s", opponentName);
+                        printWriter.println();
                         Platform.runLater(() -> controller.getMainView().getEnemyLabel().setText(opponentName));
                     } else if ("n".equals(element)) {
                         return;
                     } else if ("enemyResult".equals(element)) {
-                        acceptFire(response);
+                        printWriter.printf("Enemy fire from %s accepted. %s", opponentName, acceptFire(response));
+                        printWriter.println();
                     } else if ("yourResult".equals(element)) {
-                        acceptResultOfYourFire(response);
+                        printWriter.printf("Your fire on %s. %s", opponentName, acceptResultOfYourFire(response));
+                        printWriter.println();
                     } else if ("Do".equals(element)) {
                         acceptOrRejectPlayer(response);
+                        printWriter.println("Consideration of the request from the player");
                     }
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -80,7 +81,6 @@ public class ClientModel extends Thread {
             outputStream.writeObject(new LongMessage("y " + opponentName + " " + yourName));
         } else {
             outputStream.writeObject(new LongMessage("n " + response[response.length - 1] + " " + yourName));
-            return;
         }
     }
 
@@ -102,25 +102,29 @@ public class ClientModel extends Thread {
         outputStream.writeObject(new LongMessage(fireCoordinates));
     }
 
-    private void acceptResultOfYourFire(String[] response) throws IOException {
+    private String acceptResultOfYourFire(String[] response) throws IOException {
         String[] tempArray = new String[2];
         tempArray[0] = response[1];
         tempArray[1] = response[2];
         if (Boolean.valueOf(response[response.length - 1])) {
             controller.acceptResult(tempArray);
+            return "You hit the enemy";
         } else {
             controller.acceptFalseResult(tempArray);
+            return "You did not hit the enemy";
         }
     }
 
-    private void acceptFire(String[] enemyFire) throws IOException {
+    private String acceptFire(String[] enemyFire) throws IOException {
         String[] tempArray = new String[2];
         tempArray[0] = enemyFire[1];
         tempArray[1] = enemyFire[2];
         if (Boolean.valueOf(enemyFire[enemyFire.length - 1])) {
             controller.getShot(tempArray);
+            return "The enemy hit you";
         } else {
             controller.getShotPast(tempArray);
+            return "The enemy did not hit you";
         }
     }
 

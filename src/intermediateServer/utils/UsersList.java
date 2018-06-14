@@ -15,7 +15,7 @@ public class UsersList {
 
     private Map<String, ClientInfo> onlineUsers = new HashMap<String, ClientInfo>();
 
-    public void addUser(String nickname, Socket socket, ObjectOutputStream outputStream, ObjectInputStream inputStream, Board board) {
+    void addUser(String nickname, Socket socket, ObjectOutputStream outputStream, ObjectInputStream inputStream, Board board) {
         System.out.println(nickname + " connected");
 
         if (!this.onlineUsers.containsKey(nickname)) {
@@ -34,21 +34,21 @@ public class UsersList {
         this.onlineUsers.remove(nickname);
     }
 
-    public Map<String, ClientInfo> getUsers() {
+    Map<String, ClientInfo> getUsers() {
         return this.onlineUsers;
     }
 
-    public void incrementClientWinsByName(String nickname) {
+    void incrementClientWinsByName(String nickname) {
         int tempWins = onlineUsers.get(nickname).getWins() + 1;
         onlineUsers.get(nickname).setWins(tempWins);
     }
 
-    public void incrementClientLossesByName(String nickname) {
+    void incrementClientLossesByName(String nickname) {
         int tempLosses = onlineUsers.get(nickname).getLosses() + 1;
         onlineUsers.get(nickname).setLosses(tempLosses);
     }
 
-    public String[] getUsersName() {
+    String[] getUsersName() {
         ArrayList<String> arrayList = new ArrayList<>();
         String result;
         boolean busy;
@@ -71,7 +71,7 @@ public class UsersList {
         return resultArray;
     }
 
-    public ArrayList<ClientInfo> getClientsList() {
+    ArrayList<ClientInfo> getClientsList() {
         ArrayList<ClientInfo> clientsList = new ArrayList<ClientInfo>(this.onlineUsers.entrySet().size());
         String s = "";
         for (Map.Entry<String, ClientInfo> m : this.onlineUsers.entrySet()) {

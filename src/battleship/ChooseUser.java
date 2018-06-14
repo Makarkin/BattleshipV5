@@ -8,7 +8,6 @@ import java.util.Scanner;
 
 public class ChooseUser extends Thread {
     private String[] users;
-    private String request;
     private Controller controller;
     private ObjectOutputStream outputStream;
 
@@ -24,6 +23,7 @@ public class ChooseUser extends Thread {
         Scanner scanner = new Scanner(System.in);
         int index;
         String s = scanner.nextLine().toLowerCase();
+        String request;
         if ("r".equals(s)) {
             return;
         } else {
@@ -36,7 +36,7 @@ public class ChooseUser extends Thread {
             }
         }
 
-        if (request != "") {
+        if (!"".equals(request)) {
             try {
                 outputStream.writeObject(new LongMessage(request));
             } catch (IOException e) {

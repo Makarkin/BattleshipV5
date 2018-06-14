@@ -28,11 +28,11 @@ public class MainView extends Application {
     private Label gameMessage;
     private Button startButton;
 
-    public GridPane getYourBoard() {
+    GridPane getYourBoard() {
         return yourBoard;
     }
 
-    public GridPane getEnemyBoard() {
+    GridPane getEnemyBoard() {
         return enemyBoard;
     }
 
@@ -40,7 +40,7 @@ public class MainView extends Application {
         return youLabel;
     }
 
-    public Label getEnemyLabel() {
+    Label getEnemyLabel() {
         return enemyLabel;
     }
 

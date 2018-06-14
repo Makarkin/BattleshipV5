@@ -61,10 +61,12 @@ public class PoolRequestHandler extends Thread {
 
     private void victoryMethod(String[] requestBody) {
         Server.getUserList().incrementClientWinsByName(requestBody[1]);
+        Server.getUserList().getUsers().get(requestBody[1]).setBusy(false);
     }
 
     private void loseMethod(String[] requestBody) {
-        Server.getUserList().incrementClientWinsByName(requestBody[1]);
+        Server.getUserList().incrementClientLossesByName(requestBody[1]);
+        Server.getUserList().getUsers().get(requestBody[1]).setBusy(false);
     }
 
     private void notResponseMethod(String[] requestBody) throws IOException {

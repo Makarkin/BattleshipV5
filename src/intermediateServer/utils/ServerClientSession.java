@@ -15,10 +15,6 @@ import java.util.ArrayList;
 public class ServerClientSession extends Thread {
     private final Socket socket;
     private String nickName;
-    private Board board;
-    private LongMessage longMessage;
-    private String request;
-    private Boolean flag = true;
 
     public ServerClientSession(final Socket socket) {
         this.socket = socket;
@@ -29,28 +25,27 @@ public class ServerClientSession extends Thread {
     public void run() {
         try {
             final ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
-            this.longMessage = (LongMessage) inputStream.readObject();
-            this.nickName = this.longMessage.getNickname();
-            this.board = this.longMessage.getBoard();
+            LongMessage longMessage = (LongMessage) inputStream.readObject();
+            this.nickName = longMessage.getNickname();
+            Board board = longMessage.getBoard();
 
             final ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
             Server.getUserList().addUser(nickName, socket, outputStream, inputStream, board);
-            this.longMessage.setOnlineUsers(Server.getUserList().getUsersName());
-            this.broadcast(Server.getUserList().getClientsList(), this.longMessage);
+            longMessage.setOnlineUsers(Server.getUserList().getUsersName());
+            this.broadcast(Server.getUserList().getClientsList(), longMessage);
 
-            while (flag) {
+            Boolean flag = true;
+            while (true) {
                 Object object = inputStream.readObject();
                 System.out.println(object);
                 longMessage = (LongMessage) object;
-                request = longMessage.getReport();
+                String request = longMessage.getReport();
                 System.out.println(request + " in client session");
-                if (request != "") {
-                    Server.getRequestList().add(this.request);
+                if (!"".equals(request)) {
+                    Server.getRequestList().add(request);
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }

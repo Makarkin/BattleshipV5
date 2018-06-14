@@ -20,14 +20,6 @@ public class Cell implements Serializable {
         this.isModifable = modifable;
     }
 
-    public boolean isWasShoot() {
-        return wasShoot;
-    }
-
-    public void setWasShoot(boolean wasShoot) {
-        this.wasShoot = wasShoot;
-    }
-
     public boolean isWithShip() {
         return withShip;
     }
