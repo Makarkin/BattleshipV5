@@ -68,10 +68,8 @@ public class Controller {
     }
 
     void start(ActionEvent actionEvent) throws IOException {
-        if (numberOfShipsOnBoard == 1) {
-            enemySumOfDecks = 4;
-            yourSumOfDecks = 4;
-        System.out.println("Start");
+        if (numberOfShipsOnBoard == 0) {
+        mainView.getGameMessage().setText("Game started");
         this.clientModel = new ClientModel(this);
         this.clientModel.start();
         }
@@ -89,7 +87,7 @@ public class Controller {
         }
     }
 
-    void acceptResult(String[] result) {
+    void acceptResult(String[] result) throws IOException {
         int i = Integer.valueOf(result[0]);
         int j = Integer.valueOf(result[1]);
         Rectangle rectangle = (Rectangle) mainView.getEnemyBoard().getChildren().get(i+j*10+1);
@@ -108,7 +106,7 @@ public class Controller {
         rectangle.setFill(BLACK);
     }
 
-     void getShot(String[] result) {
+     void getShot(String[] result) throws IOException {
          yourTurn = true;
          int i = Integer.valueOf(result[0]);
          int j = Integer.valueOf(result[1]);

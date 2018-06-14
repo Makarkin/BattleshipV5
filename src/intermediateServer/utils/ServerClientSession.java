@@ -62,7 +62,7 @@ public class ServerClientSession extends Thread {
             }
         } catch (SocketException e) {
             System.out.println("in broadcast: " + this.nickName + " disconnected!");
-            Server.getUserList().deleteUser(nickName);
+           /* Server.getUserList().deleteUser(nickName);*/
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -27,30 +27,44 @@ public class PoolRequestHandler extends Thread {
                         fireMethod(requestBody);
                     } catch (IOException e) {
                         e.printStackTrace();
+                        Server.logger.error(e);
                     }
                 } else if ("request".equals(requestBody[0])) {
                     try {
                         requestMethod(requestBody);
                     } catch (IOException e) {
                         e.printStackTrace();
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
+                        Server.logger.error(e);
                     }
                 } else if ("y".equals(requestBody[0])) {
                     try {
                         responseMethod(requestBody);
                     } catch (IOException e) {
                         e.printStackTrace();
+                        Server.logger.error(e);
                     }
                 } else if ("n".equals(requestBody[0])) {
                     try {
                         notResponseMethod(requestBody);
                     } catch (IOException e) {
                         e.printStackTrace();
+                        Server.logger.error(e);
                     }
+                }  else if ("victory".equals(requestBody[0])) {
+                    victoryMethod(requestBody);
+                } else if ("lose".equals(requestBody[0])) {
+                    loseMethod(requestBody);
                 }
             }
         }
+    }
+
+    private void victoryMethod(String[] requestBody) {
+        Server.getUserList().incrementClientWinsByName(requestBody[1]);
+    }
+
+    private void loseMethod(String[] requestBody) {
+        Server.getUserList().incrementClientWinsByName(requestBody[1]);
     }
 
     private void notResponseMethod(String[] requestBody) throws IOException {
@@ -59,7 +73,7 @@ public class PoolRequestHandler extends Thread {
         Server.getUserList().getUsers().get(responseTo).getThisObjectOutputStream().writeObject(new LongMessage("n"));
     }
 
-    private void requestMethod(String[] requestBody) throws IOException, ClassNotFoundException {
+    private void requestMethod(String[] requestBody) throws IOException {
         String requestTo = requestBody[1];
         String requestFrom = requestBody[2];
         String request = String.format("Do you want to play with %s", requestFrom);

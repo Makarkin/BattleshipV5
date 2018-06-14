@@ -4,6 +4,7 @@ import generalClasses.LongMessage;
 import intermediateServer.utils.PoolRequestHandler;
 import intermediateServer.utils.ServerClientSession;
 import intermediateServer.utils.UsersList;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;

@@ -38,12 +38,28 @@ public class UsersList {
         return this.onlineUsers;
     }
 
+    public void incrementClientWinsByName(String nickname) {
+        int tempWins = onlineUsers.get(nickname).getWins() + 1;
+        onlineUsers.get(nickname).setWins(tempWins);
+    }
+
+    public void incrementClientLossesByName(String nickname) {
+        int tempLosses = onlineUsers.get(nickname).getLosses() + 1;
+        onlineUsers.get(nickname).setLosses(tempLosses);
+    }
+
     public String[] getUsersName() {
         ArrayList<String> arrayList = new ArrayList<>();
-        String result = new String();
+        String result;
+        boolean busy;
+        int wins ;
+        int losses;
         Set<String> set = onlineUsers.keySet();
         for (String s : set) {
-            result = s + " " + onlineUsers.get(s).getBusy();
+            busy = onlineUsers.get(s).getBusy();
+            wins = onlineUsers.get(s).getWins();
+            losses = onlineUsers.get(s).getLosses();
+            result = String.format("%s %s %s %s", s, busy, wins, losses);
             arrayList.add(result);
         }
 

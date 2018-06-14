@@ -1,6 +1,7 @@
 package battleship;
 
 import generalClasses.LongMessage;
+import javafx.application.Platform;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -17,11 +18,13 @@ public class ClientModel extends Thread {
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
     private String opponentName;
+    private String yourName;
 
     ClientModel(Controller controller) throws IOException {
         InetAddress address = InetAddress.getByName(controller.getIntrServerAddress());
         this.socket = new Socket(address, controller.getPort());
         this.controller = controller;
+        this.yourName = controller.getMainView().getYouLabel().getText();
     }
 
     @Override
@@ -46,6 +49,7 @@ public class ClientModel extends Thread {
                     String element = response[0];
                     if ("y".equals(element)) {
                         opponentName = response[1];
+                        Platform.runLater(() -> controller.getMainView().getEnemyLabel().setText(opponentName));
                     } else if ("n".equals(element)) {
                         return;
                     } else if ("enemyResult".equals(element)) {
@@ -72,32 +76,33 @@ public class ClientModel extends Thread {
         if ("y".equals(s)) {
             controller.setYourTurn(true);
             opponentName = response[response.length - 1];
-            outputStream.writeObject(new LongMessage("y " + opponentName + " " + controller.getMainView().getYouLabel().getText()));
+            Platform.runLater(() -> controller.getMainView().getEnemyLabel().setText(opponentName));
+            outputStream.writeObject(new LongMessage("y " + opponentName + " " + yourName));
         } else {
-            outputStream.writeObject(new LongMessage("n " + response[response.length - 1] + " " + controller.getMainView().getYouLabel().getText()));
+            outputStream.writeObject(new LongMessage("n " + response[response.length - 1] + " " + yourName));
             return;
         }
     }
 
     private void showUser(String[] users) {
         Date date = new Date();
-
         String[] info;
         System.out.println(date.toString());
         for (int i = 0; i < users.length; i++) {
             info = users[i].split(" ");
-            if (!controller.getMainView().getYouLabel().getText().equals(info[0])) {
-                System.out.println("Number of player: " + i + "; Name: " + info[0] + "; Is busy: " + info[1]);
+            if (!yourName.equals(info[0])) {
+                System.out.printf("Number of player: %s; Name: %s;  Busy: %s; Wins: %s; Losses: %s", i, info[0], info[1], info[2], info[3]);
+                System.out.println();
             }
         }
     }
 
     void transferFire(String fireCoordinates) throws IOException {
-        fireCoordinates += String.format(" %s %s", opponentName, controller.getMainView().getYouLabel().getText());
+        fireCoordinates += String.format(" %s %s", opponentName, yourName);
         outputStream.writeObject(new LongMessage(fireCoordinates));
     }
 
-    private void acceptResultOfYourFire(String[] response) {
+    private void acceptResultOfYourFire(String[] response) throws IOException {
         String[] tempArray = new String[2];
         tempArray[0] = response[1];
         tempArray[1] = response[2];
@@ -108,7 +113,7 @@ public class ClientModel extends Thread {
         }
     }
 
-    private void acceptFire(String[] enemyFire) {
+    private void acceptFire(String[] enemyFire) throws IOException {
         String[] tempArray = new String[2];
         tempArray[0] = enemyFire[1];
         tempArray[1] = enemyFire[2];
@@ -119,9 +124,11 @@ public class ClientModel extends Thread {
         }
     }
 
-    void transferLoseMessage() {
+    void transferLoseMessage() throws IOException {
+        outputStream.writeObject(new LongMessage("lose " + yourName));
     }
 
-    void transferVictoryMessage() {
+    void transferVictoryMessage() throws IOException {
+        outputStream.writeObject(new LongMessage("victory " + yourName));
     }
 }

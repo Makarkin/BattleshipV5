@@ -15,7 +15,22 @@ public class ClientInfo implements Serializable {
     private Board board;
     private Boolean isBusy = false;
     private int wins = 0;
-    private int lose = 0;
+    private int losses = 0;
+
+    public ClientInfo(Socket socket , ObjectOutputStream outputStream , ObjectInputStream inputStream, Board board) {
+        this.socket = socket;
+        this.outputStream = outputStream;
+        this.inputStream = inputStream;
+        this.board = board;
+    }
+
+    public void setWins(int wins) {
+        this.wins = wins;
+    }
+
+    public void setLosses(int losses) {
+        this.losses = losses;
+    }
 
     public void setBusy(Boolean busy) {
         isBusy = busy;
@@ -26,19 +41,20 @@ public class ClientInfo implements Serializable {
         return board;
     }
 
+    public int getWins() {
+        return wins;
+    }
+
+    public int getLosses() {
+        return losses;
+    }
+
     public Boolean getBusy() {
         return isBusy;
     }
 
     public ClientInfo(Socket socket){
         this.socket = socket;
-    }
-
-    public ClientInfo(Socket socket , ObjectOutputStream outputStream , ObjectInputStream inputStream, Board board) {
-        this.socket = socket;
-        this.outputStream = outputStream;
-        this.inputStream = inputStream;
-        this.board = board;
     }
 
     public Socket getSocket() {
