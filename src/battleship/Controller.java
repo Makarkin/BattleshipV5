@@ -115,8 +115,7 @@ public class Controller {
          yourSumOfDecks--;
          Platform.runLater(() -> getMainView().getGameMessage().setText("Your turn"));
          if (yourSumOfDecks == 0) {
-             Platform.runLater(()-> mainView.getGameMessage().setText("You lose!"));
-             clientModel.transferLoseMessage();
+             loseMethod();
          }
      }
 
@@ -344,5 +343,10 @@ public class Controller {
                 yourBoard.getIndexCell(i, j).setFrozen(true);
             }
         }
+    }
+
+    public void loseMethod() throws IOException {
+        Platform.runLater(()-> mainView.getGameMessage().setText("You lose!"));
+        clientModel.transferLoseMessage();
     }
 }

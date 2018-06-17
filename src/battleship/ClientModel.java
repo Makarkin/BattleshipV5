@@ -8,6 +8,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Date;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ClientModel extends Thread {
 
@@ -16,12 +18,15 @@ public class ClientModel extends Thread {
     private ObjectOutputStream outputStream;
     private String opponentName;
     private String yourName;
+    private Timer timer;
+    private int timeInterval;
 
     ClientModel(Controller controller) throws IOException {
         InetAddress address = InetAddress.getByName(controller.getIntrServerAddress());
         this.socket = new Socket(address, controller.getPort());
         this.controller = controller;
         this.yourName = controller.getMainView().getYouLabel().getText();
+        this.timeInterval = 60;
     }
 
     @Override
@@ -50,6 +55,9 @@ public class ClientModel extends Thread {
                         printWriter.printf("Opponent selected. It is %s", opponentName);
                         printWriter.println();
                         Platform.runLater(() -> controller.getMainView().getEnemyLabel().setText(opponentName));
+                        timer = new Timer();
+                        Countdown countdown = new Countdown();
+                        timer.scheduleAtFixedRate(countdown, 1000, 1000);
                     } else if ("n".equals(element)) {
                         return;
                     } else if ("enemyResult".equals(element)) {
@@ -61,6 +69,7 @@ public class ClientModel extends Thread {
                     } else if ("Do".equals(element)) {
                         acceptOrRejectPlayer(response);
                         printWriter.println("Consideration of the request from the player");
+                        printWriter.println();
                     }
                 }
             }
@@ -78,6 +87,9 @@ public class ClientModel extends Thread {
             controller.setYourTurn(true);
             opponentName = response[response.length - 1];
             Platform.runLater(() -> controller.getMainView().getEnemyLabel().setText(opponentName));
+            timer = new Timer();
+            Countdown countdown = new Countdown();
+            timer.scheduleAtFixedRate(countdown, 1000, 1000);
             outputStream.writeObject(new LongMessage("y " + opponentName + " " + yourName));
         } else {
             outputStream.writeObject(new LongMessage("n " + response[response.length - 1] + " " + yourName));
@@ -134,5 +146,22 @@ public class ClientModel extends Thread {
 
     void transferVictoryMessage() throws IOException {
         outputStream.writeObject(new LongMessage("victory " + yourName));
+    }
+
+    class Countdown extends TimerTask {
+
+        @Override
+        public void run() {
+            if (timeInterval == 0) {
+                timer.cancel();
+                try {
+                    controller.loseMethod();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            timeInterval--;
+        }
     }
 }
