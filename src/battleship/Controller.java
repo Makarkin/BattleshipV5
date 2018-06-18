@@ -67,7 +67,7 @@ public class Controller {
     }
 
     void start(ActionEvent actionEvent) throws IOException {
-        if (numberOfShipsOnBoard == 0) {
+        if (numberOfShipsOnBoard == 10) {
         mainView.getGameMessage().setText("Game started");
         this.clientModel = new ClientModel(this);
         this.clientModel.start();
