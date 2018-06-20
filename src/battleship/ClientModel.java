@@ -40,7 +40,6 @@ public class ClientModel extends Thread {
             outputStream = new ObjectOutputStream(this.socket.getOutputStream());
             outputStream.writeObject(longMessage);
             ObjectInputStream inputStream = new ObjectInputStream(this.socket.getInputStream());
-            printWriter.println("Battle started");
             while (true) {
                 LongMessage message = (LongMessage) inputStream.readObject();
                 users = message.getOnlineUsers();
