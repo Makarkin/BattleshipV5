@@ -14,6 +14,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 public class MainView extends Application {
@@ -26,7 +27,17 @@ public class MainView extends Application {
     private Label youLabel;
     private Label enemyLabel;
     private Label gameMessage;
+    private Label help;
     private Button startButton;
+
+    public Label getHelp() {
+        return help;
+    }
+
+    public Button getStartButton() {
+
+        return startButton;
+    }
 
     GridPane getYourBoard() {
         return yourBoard;
@@ -73,7 +84,9 @@ public class MainView extends Application {
 
     private void setActionsOnYourBoard(GridPane gridPane) {
         for (Node element : gridPane.getChildren()) {
-            element.setOnMouseClicked(e -> controller.placeShip(e));
+            if (element.getClass() == Rectangle.class) {
+                element.setOnMouseClicked(e -> controller.placeShip(e));
+            }
         }
     }
 
@@ -93,28 +106,32 @@ public class MainView extends Application {
         yourBoard.setPrefSize(392, 314);
         addRectangle(yourBoard);
         setActionsOnYourBoard(yourBoard);
-        yourBoard.relocate(100,100);
+        yourBoard.relocate(20,150);
 
         enemyBoard.setPrefSize(392, 314);
         addRectangle(enemyBoard);
         setActionsOnEnemyBoard(enemyBoard);
-        enemyBoard.relocate(700, 100);
+        enemyBoard.relocate(680, 150);
 
-        startButton.setPrefSize(50, 30);
+        startButton.setPrefSize(200, 30);
         setActionsOnYourButton(startButton);
-        startButton.relocate(460, 400);
+        startButton.relocate(400, 400);
+        startButton.setDisable(true);
 
 
-        youLabel.relocate(100,60);
+        youLabel.relocate(100,100);
         youLabel.setFont(Font.font(18));
 
-        enemyLabel.relocate(700,60);
+        enemyLabel.relocate(700,100);
         enemyLabel.setFont(Font.font(18));
 
         gameMessage.relocate(420, 200);
         gameMessage.setFont(Font.font(18));
 
-        parentPane.getChildren().addAll(yourBoard, enemyBoard, youLabel, enemyLabel, gameMessage ,startButton);
+        help.relocate(20,480);
+        help.setFont(Font.font(18));
+
+        parentPane.getChildren().addAll(yourBoard, enemyBoard, youLabel, enemyLabel, gameMessage, startButton, help);
         return parentPane;
     }
 
@@ -126,15 +143,17 @@ public class MainView extends Application {
         youLabel = new Label();
         enemyLabel = new Label();
         gameMessage = new Label();
+        help = new Label();
         startButton = new Button();
 
         enemyLabel.setText("Enemy");
-        startButton.setText("Start");
-        gameMessage.setText("Place your ship");
+        startButton.setText("Connect with server");
+        gameMessage.setText("Place your 4-deck ship");
+        help.setText("Right mouse click for vertical ship\nLeft mouse click for horizontal ship");
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter your nickname");
-        youLabel.setText(/*Stas"*/scanner.nextLine());
+        youLabel.setText(scanner.nextLine());
         System.out.println("Enter addres of server");
         String address = "127.0.0.1"/*scanner.nextLine()*/;
         System.out.println("Enter port of server");

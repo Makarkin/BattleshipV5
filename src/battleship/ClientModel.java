@@ -16,17 +16,19 @@ public class ClientModel extends Thread {
     private Controller controller;
     private Socket socket;
     private ObjectOutputStream outputStream;
-    private String opponentName;
+    private String opponentName = null;
     private String yourName;
     private Timer timer;
     private int timeInterval;
+    private Scanner scanner;
 
     ClientModel(Controller controller) throws IOException {
         InetAddress address = InetAddress.getByName(controller.getIntrServerAddress());
         this.socket = new Socket(address, controller.getPort());
         this.controller = controller;
         this.yourName = controller.getMainView().getYouLabel().getText();
-        this.timeInterval = 60;
+        this.timeInterval = 120;
+        scanner = new Scanner(System.in);
     }
 
     @Override
@@ -42,9 +44,10 @@ public class ClientModel extends Thread {
             while (true) {
                 LongMessage message = (LongMessage) inputStream.readObject();
                 users = message.getOnlineUsers();
-                ChooseUser chooseUser = new ChooseUser(users, controller, outputStream);
-                if (users != null) {
+                if (users != null && users.length > 1) {
+                    Platform.runLater(() -> controller.getMainView().getGameMessage().setText("Search for players"));
                     showUser(users);
+                    ChooseUser chooseUser = new ChooseUser(users, controller, outputStream);
                     chooseUser.start();
                     printWriter.println("Selecting an opponent");
                 } else {
@@ -55,6 +58,7 @@ public class ClientModel extends Thread {
                         printWriter.printf("Opponent selected. It is %s", opponentName);
                         printWriter.println();
                         Platform.runLater(() -> controller.getMainView().getEnemyLabel().setText(opponentName));
+                        Platform.runLater(() -> controller.getMainView().getGameMessage().setText("Game started. Enemy turn"));
                         timer = new Timer();
                         Countdown countdown = new Countdown();
                         timer.scheduleAtFixedRate(countdown, 1000, 1000);
@@ -67,7 +71,7 @@ public class ClientModel extends Thread {
                         printWriter.printf("Your fire on %s. %s", opponentName, acceptResultOfYourFire(response));
                         printWriter.println();
                     } else if ("Do".equals(element)) {
-                        acceptOrRejectPlayer(response);
+                        acceptOrRejectPlayer(response, scanner);
                         printWriter.println("Consideration of the request from the player");
                         printWriter.println();
                     }
@@ -78,8 +82,7 @@ public class ClientModel extends Thread {
         }
     }
 
-    private void acceptOrRejectPlayer(String[] response) throws IOException {
-        Scanner scanner = new Scanner(System.in);
+    private void acceptOrRejectPlayer(String[] response, Scanner scanner) throws IOException {
         System.out.printf("Do you want to play with %s y/n", response[response.length - 1]);
         System.out.println();
         String s = "y"/*scanner.nextLine()*/;
@@ -87,6 +90,7 @@ public class ClientModel extends Thread {
             controller.setYourTurn(true);
             opponentName = response[response.length - 1];
             Platform.runLater(() -> controller.getMainView().getEnemyLabel().setText(opponentName));
+            Platform.runLater(() -> controller.getMainView().getGameMessage().setText("Game started. Your turn"));
             timer = new Timer();
             Countdown countdown = new Countdown();
             timer.scheduleAtFixedRate(countdown, 1000, 1000);
@@ -155,13 +159,15 @@ public class ClientModel extends Thread {
             if (timeInterval == 0) {
                 timer.cancel();
                 try {
-                    controller.loseMethod();
+                    controller.loseTimeMethod();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
 
             timeInterval--;
+            String s = String.valueOf(timeInterval/6);
+            Platform.runLater(() -> controller.getMainView().getHelp().setText(s + " minutes left"));
         }
     }
 }

@@ -13,6 +13,7 @@ import javafx.scene.shape.Rectangle;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import static javafx.scene.input.MouseButton.PRIMARY;
@@ -68,9 +69,10 @@ public class Controller {
 
     void start(ActionEvent actionEvent) throws IOException {
         if (numberOfShipsOnBoard == 10) {
-        mainView.getGameMessage().setText("Game started");
-        this.clientModel = new ClientModel(this);
-        this.clientModel.start();
+            mainView.getStartButton().setDisable(true);
+            mainView.getGameMessage().setText("Connect...");
+            this.clientModel = new ClientModel(this);
+            this.clientModel.start();
         }
     }
 
@@ -90,41 +92,46 @@ public class Controller {
     void acceptResult(String[] result) throws IOException {
         int i = Integer.valueOf(result[0]);
         int j = Integer.valueOf(result[1]);
-        Rectangle rectangle = (Rectangle) mainView.getEnemyBoard().getChildren().get(i+j*10+1);
+        Rectangle rectangle = (Rectangle) mainView.getEnemyBoard().getChildren().get(i + j * 10 + 1);
         rectangle.setFill(RED);
         enemySumOfDecks--;
         if (enemySumOfDecks == 0) {
             Platform.runLater(() -> mainView.getGameMessage().setText("You win!"));
             clientModel.transferVictoryMessage();
+            mainView.getStartButton().setDisable(false);
         }
     }
 
     void acceptFalseResult(String[] result) {
         int i = Integer.valueOf(result[0]);
         int j = Integer.valueOf(result[1]);
-        Rectangle rectangle = (Rectangle) mainView.getEnemyBoard().getChildren().get(i+j*10+1);
+        Rectangle rectangle = (Rectangle) mainView.getEnemyBoard().getChildren().get(i + j * 10 + 1);
         rectangle.setFill(BLACK);
     }
 
-     void getShot(String[] result) throws IOException {
-         yourTurn = true;
-         int i = Integer.valueOf(result[0]);
-         int j = Integer.valueOf(result[1]);
-         Rectangle rectangle = (Rectangle) mainView.getYourBoard().getChildren().get(i+j*10+1);
-         rectangle.setFill(RED);
-         yourSumOfDecks--;
-         Platform.runLater(() -> getMainView().getGameMessage().setText("Your turn"));
-         if (yourSumOfDecks == 0) {
-             loseMethod();
-         }
-     }
+    void getShot(String[] result) throws IOException {
+        yourTurn = true;
+        Platform.runLater(() -> getMainView().getGameMessage().setText("Your turn"));
+        int i = Integer.valueOf(result[0]);
+        int j = Integer.valueOf(result[1]);
+        Rectangle rectangle = (Rectangle) mainView.getYourBoard().getChildren().get(i + j * 10 + 1);
+        rectangle.setFill(RED);
+        yourSumOfDecks--;
+        if (yourSumOfDecks == 0) {
+            loseMethod();
+            mainView.getStartButton().setDisable(false);
+        }
+
+        Platform.runLater(() -> getMainView().getGameMessage().setText("Your turn"));
+    }
 
     void getShotPast(String[] result) {
         yourTurn = true;
         int i = Integer.valueOf(result[0]);
         int j = Integer.valueOf(result[1]);
-        Rectangle rectangle = (Rectangle) mainView.getYourBoard().getChildren().get(i+j*10+1);
+        Rectangle rectangle = (Rectangle) mainView.getYourBoard().getChildren().get(i + j * 10 + 1);
         rectangle.setFill(BLACK);
+        Platform.runLater(() -> getMainView().getGameMessage().setText("Your turn"));
     }
 
     void placeShip(MouseEvent mouseEvent) {
@@ -141,27 +148,35 @@ public class Controller {
         }
 
         Cell probeCell = yourBoard.getIndexCell(i, j);
-
+        int delta = numberOfDeckList.get(numberOfShipsOnBoard) - 1;
         if (mouseButton == PRIMARY) {
 
-            if (counterList.contains(counter) && !hasShipsNear(i, j, yourBoard)) {
+
+
+            if (counterList.contains(counter) && !hasShipsNear(i, j, yourBoard) && !hasFrozenVerticalCells(i, j, delta)) {
                 probeCell.setModifable(true);
             }
 
-            if (!probeCell.isWithShip() && probeCell.isModifable() && counter < 20
-                    && checkVerticalShipPlaceConstraint(i, j, predI, predJ)
-                    && !probeCell.isFrozen()) {
+            if (!probeCell.isWithShip() && probeCell.isModifable() && counter < 20 && checkVerticalShipPlaceConstraint(i, j, predI, predJ) && !probeCell.isFrozen()) {
                 addCellWithShip(rectangle, i, j);
                 if (counterOfDeck < numberOfDeckList.get(numberOfShipsOnBoard)) {
                     if (i > 0 && i < 9) {
-                        if (!yourBoard.getIndexCell(i - 1, j).isFrozen()) yourBoard.getIndexCell(i - 1, j).setModifable(true);
-                        if (!yourBoard.getIndexCell(i + 1, j).isFrozen()) yourBoard.getIndexCell(i + 1, j).setModifable(true);
+                        if (!yourBoard.getIndexCell(i - 1, j).isFrozen()) {
+                            yourBoard.getIndexCell(i - 1, j).setModifable(true);
+                        }
+                        if (!yourBoard.getIndexCell(i + 1, j).isFrozen()) {
+                            yourBoard.getIndexCell(i + 1, j).setModifable(true);
+                        }
                     }
                     if (i == 0) {
-                        if (!yourBoard.getIndexCell(i + 1, j).isFrozen()) yourBoard.getIndexCell(i + 1, j).setModifable(true);
+                        if (!yourBoard.getIndexCell(i + 1, j).isFrozen()) {
+                            yourBoard.getIndexCell(i + 1, j).setModifable(true);
+                        }
                     }
                     if (i == 9) {
-                        if (!yourBoard.getIndexCell(i - 1, j).isFrozen()) yourBoard.getIndexCell(i - 1, j).setModifable(true);
+                        if (!yourBoard.getIndexCell(i - 1, j).isFrozen()) {
+                            yourBoard.getIndexCell(i - 1, j).setModifable(true);
+                        }
                     }
                 } else {
                     afterOneShipPlace();
@@ -169,24 +184,30 @@ public class Controller {
             }
         } else if (mouseButton == SECONDARY) {
 
-            if (counterList.contains(counter) && !hasShipsNear(i, j, yourBoard)) {
+            if (counterList.contains(counter) && !hasShipsNear(i, j, yourBoard) && !hasFrozenHorizontalCells(i, j, delta)) {
                 probeCell.setModifable(true);
             }
 
-            if (!probeCell.isWithShip() && probeCell.isModifable() && counter < 20
-                    && checkHorizontalShipPlaceConstraint(i,j, predI, predJ)
-                    && !probeCell.isFrozen()) {
+            if (!probeCell.isWithShip() && probeCell.isModifable() && counter < 20 && checkHorizontalShipPlaceConstraint(i, j, predI, predJ) && !probeCell.isFrozen()) {
                 addCellWithShip(rectangle, i, j);
                 if (counterOfDeck < numberOfDeckList.get(numberOfShipsOnBoard)) {
                     if (j > 0 && j < 9) {
-                        if (!yourBoard.getIndexCell(i, j - 1).isFrozen()) yourBoard.getIndexCell(i, j - 1).setModifable(true);
-                        if (!yourBoard.getIndexCell(i, j + 1).isFrozen()) yourBoard.getIndexCell(i, j + 1).setModifable(true);
+                        if (!yourBoard.getIndexCell(i, j - 1).isFrozen()) {
+                            yourBoard.getIndexCell(i, j - 1).setModifable(true);
+                        }
+                        if (!yourBoard.getIndexCell(i, j + 1).isFrozen()) {
+                            yourBoard.getIndexCell(i, j + 1).setModifable(true);
+                        }
                     }
                     if (j == 0) {
-                        if (!yourBoard.getIndexCell(i, j + 1).isFrozen()) yourBoard.getIndexCell(i, j + 1).setModifable(true);
+                        if (!yourBoard.getIndexCell(i, j + 1).isFrozen()) {
+                            yourBoard.getIndexCell(i, j + 1).setModifable(true);
+                        }
                     }
                     if (j == 9) {
-                        if (!yourBoard.getIndexCell(i, j - 1).isFrozen()) yourBoard.getIndexCell(i, j - 1).setModifable(true);
+                        if (!yourBoard.getIndexCell(i, j - 1).isFrozen()) {
+                            yourBoard.getIndexCell(i, j - 1).setModifable(true);
+                        }
                     }
                 } else {
                     afterOneShipPlace();
@@ -212,10 +233,13 @@ public class Controller {
         freezeCell(itShouldFrozen, yourBoard);
         itShouldFrozen.clear();
         if (10 - numberOfShipsOnBoard > 0) {
-        mainView.getGameMessage().setText("You have left to place " + (10 - numberOfShipsOnBoard) + " ships");
-        } else { mainView.getGameMessage().setText("Press start");
+            String s = String.format("Place the %s-deck ship", numberOfDeckList.get(numberOfShipsOnBoard));
+            mainView.getGameMessage().setText(s);
+        } else {
+            mainView.getHelp().setText("");
+            mainView.getGameMessage().setText("Press connect button");
+            mainView.getStartButton().setDisable(false);
         }
-
     }
 
     private static boolean checkVerticalShipPlaceConstraint(int rowCounter, int columnCounter, Integer predI, Integer predJ) {
@@ -314,13 +338,38 @@ public class Controller {
     private static void freezeCell(ArrayList<IndexVault> itShouldFrozen, Board yourBoard) {
         IndexVault vaultFirst = itShouldFrozen.get(0);
         IndexVault vaultLast = itShouldFrozen.get(itShouldFrozen.size() - 1);
-        IndexVault first = IndexVault.getHigherVault(vaultFirst, vaultLast);
-        IndexVault last = IndexVault.getLowerVault(vaultFirst, vaultLast);
+        ArrayList<Integer> indexesI = new ArrayList<>();
+        indexesI.add(vaultFirst.getI());
+        indexesI.add(vaultLast.getI());
 
-        int imin = first.getI();
-        int imax = last.getI();
-        int jmin = first.getJ();
-        int jmax = last.getJ();
+        indexesI.sort((i1, i2) -> {
+            if (i1 > i2) {
+                return 1;
+            } else if (i1 < i2) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+
+        ArrayList<Integer> indexesJ = new ArrayList<>();
+        indexesJ.add(vaultFirst.getJ());
+        indexesJ.add(vaultLast.getJ());
+
+        indexesJ.sort((i1, i2) -> {
+            if (i1 > i2) {
+                return 1;
+            } else if (i1 < i2) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+
+        int imin = indexesI.get(0);
+        int imax = indexesI.get(indexesI.size() - 1);
+        int jmin = indexesJ.get(0);
+        int jmax = indexesJ.get(indexesI.size() - 1);
 
         if (imin != 0) {
             imin -= 1;
@@ -345,8 +394,39 @@ public class Controller {
         }
     }
 
-    public void loseMethod() throws IOException {
+    boolean hasFrozenVerticalCells(int i, int j, int delta) {
+        try {
+            if (!yourBoard.getIndexCell(i, j).isFrozen() || !yourBoard.getIndexCell(i - delta, j).isFrozen()
+                    || !yourBoard.getIndexCell(i + delta, j).isFrozen()) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+            return true;
+        }
+    }
+
+    private boolean hasFrozenHorizontalCells(Integer i, Integer j, int delta) {
+        try {
+            if (!yourBoard.getIndexCell(i, j).isFrozen() || !yourBoard.getIndexCell(i, j - delta).isFrozen()
+                    || !yourBoard.getIndexCell(i, j + delta).isFrozen()) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+            return true;
+        }
+    }
+
+    private void loseMethod() throws IOException {
         Platform.runLater(()-> mainView.getGameMessage().setText("You lose!"));
+        clientModel.transferLoseMessage();
+    }
+
+    void loseTimeMethod() throws IOException {
+        Platform.runLater(()-> mainView.getGameMessage().setText("Time is ended! You lose!"));
         clientModel.transferLoseMessage();
     }
 }
