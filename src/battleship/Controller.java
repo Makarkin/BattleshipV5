@@ -396,8 +396,8 @@ public class Controller {
 
     boolean hasFrozenVerticalCells(int i, int j, int delta) {
         try {
-            if (!yourBoard.getIndexCell(i, j).isFrozen() || !yourBoard.getIndexCell(i - delta, j).isFrozen()
-                    || !yourBoard.getIndexCell(i + delta, j).isFrozen()) {
+            if (!yourBoard.getIndexCell(i, j).isFrozen() && !yourBoard.getIndexCell(i - delta, j).isFrozen()
+                    && !yourBoard.getIndexCell(i + delta, j).isFrozen()) {
                 return false;
             } else {
                 return true;
@@ -409,8 +409,8 @@ public class Controller {
 
     private boolean hasFrozenHorizontalCells(Integer i, Integer j, int delta) {
         try {
-            if (!yourBoard.getIndexCell(i, j).isFrozen() || !yourBoard.getIndexCell(i, j - delta).isFrozen()
-                    || !yourBoard.getIndexCell(i, j + delta).isFrozen()) {
+            if (!yourBoard.getIndexCell(i, j).isFrozen() && !yourBoard.getIndexCell(i, j - delta).isFrozen()
+                    && !yourBoard.getIndexCell(i, j + delta).isFrozen()) {
                 return false;
             } else {
                 return true;
