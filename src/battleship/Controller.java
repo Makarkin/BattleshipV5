@@ -150,7 +150,6 @@ public class Controller {
 
             Cell probeCell = yourBoard.getIndexCell(i, j);
             int delta = numberOfDeckList.get(numberOfShipsOnBoard) - 1;
-            System.out.println(numberOfShipsOnBoard);
             if (mouseButton == PRIMARY) {
 
 
