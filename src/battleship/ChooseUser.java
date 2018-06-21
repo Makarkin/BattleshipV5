@@ -19,11 +19,10 @@ public class ChooseUser extends Thread {
 
     @Override
     public void run() {
-        System.out.println("Choose number of your opponent. For refresh opponents list enter \"r\" ");
+        System.out.println("Choose number of your opponent. r - refresh list");
         int index;
         Scanner scanner = new Scanner(System.in);
         String s = scanner.nextLine();
-        System.out.println(s);
         String request;
         if ("r".equals(s)) {
             return;

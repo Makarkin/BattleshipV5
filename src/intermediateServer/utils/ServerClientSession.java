@@ -34,7 +34,6 @@ public class ServerClientSession extends Thread {
             longMessage.setOnlineUsers(Server.getUserList().getUsersName());
             this.broadcast(Server.getUserList().getClientsList(), longMessage);
 
-            Boolean flag = true;
             while (true) {
                 Object object = inputStream.readObject();
                 System.out.println(object);
@@ -57,7 +56,6 @@ public class ServerClientSession extends Thread {
             }
         } catch (SocketException e) {
             System.out.println("in broadcast: " + this.nickName + " disconnected!");
-           /* Server.getUserList().deleteUser(nickName);*/
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -72,13 +72,15 @@ public class MainView extends Application {
 
     private void setActionsOnEnemyBoard(GridPane gridPane) {
         for (Node element : gridPane.getChildren()) {
-            element.setOnMouseClicked(e -> {
-                try {
-                    controller.makeShot(e);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            });
+            if (element.getClass() == Rectangle.class) {
+                element.setOnMouseClicked(e -> {
+                    try {
+                        controller.makeShot(e);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                });
+            }
         }
     }
 

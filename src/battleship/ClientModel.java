@@ -10,8 +10,6 @@ import java.util.Date;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class ClientModel extends Thread {
 
@@ -21,7 +19,9 @@ public class ClientModel extends Thread {
     private String opponentName = null;
     private String yourName;
     private Timer timer;
+    private Timer enterTimer;
     private int timeInterval;
+    private int counter;
     private Scanner scanner;
 
     ClientModel(Controller controller) throws IOException {
@@ -30,6 +30,7 @@ public class ClientModel extends Thread {
         this.controller = controller;
         this.yourName = controller.getMainView().getYouLabel().getText();
         this.timeInterval = 120;
+        this.counter = 10;
         scanner = new Scanner(System.in);
     }
 
@@ -50,6 +51,7 @@ public class ClientModel extends Thread {
                     showUser(users);
                     ChooseUser chooseUser = new ChooseUser(users, controller, outputStream);
                     chooseUser.start();
+                    chooseUser.join();
                     printWriter.println("Selecting an opponent");
                 } else {
                     String[] response = message.getReport().split(" ");
@@ -80,13 +82,15 @@ public class ClientModel extends Thread {
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
     private void acceptOrRejectPlayer(String[] response, Scanner scanner) throws IOException {
         System.out.printf("Do you want to play with %s y/n", response[response.length - 1]);
         System.out.println();
-        String s = "y"/*scanner.nextLine()*/;
+        String s = scanner.nextLine();
         if ("y".equals(s)) {
             controller.setYourTurn(true);
             opponentName = response[response.length - 1];
@@ -169,6 +173,24 @@ public class ClientModel extends Thread {
             timeInterval--;
             String s = String.valueOf(timeInterval/6);
             Platform.runLater(() -> controller.getMainView().getHelp().setText(s + " minutes left"));
+        }
+    }
+
+    class EnterNameCountdown extends TimerTask {
+        private ChooseUser chooseUser;
+
+        EnterNameCountdown(ChooseUser chooseUser) {
+            this.chooseUser = chooseUser;
+            chooseUser.start();
+        }
+
+        @Override
+        public void run() {
+            if (counter == 0) {
+                enterTimer.cancel();
+            }
+
+            counter--;
         }
     }
 }
