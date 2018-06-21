@@ -135,82 +135,84 @@ public class Controller {
     }
 
     void placeShip(MouseEvent mouseEvent) {
-        MouseButton mouseButton = mouseEvent.getButton();
-        Rectangle rectangle = (Rectangle) mouseEvent.getSource();
-        Integer i = GridPane.getRowIndex(rectangle);
-        Integer j = GridPane.getColumnIndex(rectangle);
-        if (i == null) {
-            i = 0;
-        }
-
-        if (j == null) {
-            j = 0;
-        }
-
-        Cell probeCell = yourBoard.getIndexCell(i, j);
-        int delta = numberOfDeckList.get(numberOfShipsOnBoard) - 1;
-        if (mouseButton == PRIMARY) {
-
-
-
-            if (counterList.contains(counter) && !hasShipsNear(i, j, yourBoard) && !hasFrozenVerticalCells(i, j, delta)) {
-                probeCell.setModifable(true);
+        if (numberOfShipsOnBoard < 10) {
+            MouseButton mouseButton = mouseEvent.getButton();
+            Rectangle rectangle = (Rectangle) mouseEvent.getSource();
+            Integer i = GridPane.getRowIndex(rectangle);
+            Integer j = GridPane.getColumnIndex(rectangle);
+            if (i == null) {
+                i = 0;
             }
 
-            if (!probeCell.isWithShip() && probeCell.isModifable() && counter < 20 && checkVerticalShipPlaceConstraint(i, j, predI, predJ) && !probeCell.isFrozen()) {
-                addCellWithShip(rectangle, i, j);
-                if (counterOfDeck < numberOfDeckList.get(numberOfShipsOnBoard)) {
-                    if (i > 0 && i < 9) {
-                        if (!yourBoard.getIndexCell(i - 1, j).isFrozen()) {
-                            yourBoard.getIndexCell(i - 1, j).setModifable(true);
-                        }
-                        if (!yourBoard.getIndexCell(i + 1, j).isFrozen()) {
-                            yourBoard.getIndexCell(i + 1, j).setModifable(true);
-                        }
-                    }
-                    if (i == 0) {
-                        if (!yourBoard.getIndexCell(i + 1, j).isFrozen()) {
-                            yourBoard.getIndexCell(i + 1, j).setModifable(true);
-                        }
-                    }
-                    if (i == 9) {
-                        if (!yourBoard.getIndexCell(i - 1, j).isFrozen()) {
-                            yourBoard.getIndexCell(i - 1, j).setModifable(true);
-                        }
-                    }
-                } else {
-                    afterOneShipPlace();
+            if (j == null) {
+                j = 0;
+            }
+
+            Cell probeCell = yourBoard.getIndexCell(i, j);
+            int delta = numberOfDeckList.get(numberOfShipsOnBoard) - 1;
+            System.out.println(numberOfShipsOnBoard);
+            if (mouseButton == PRIMARY) {
+
+
+                if (counterList.contains(counter) && !hasShipsNear(i, j, yourBoard) && !hasFrozenVerticalCells(i, j, delta)) {
+                    probeCell.setModifable(true);
                 }
-            }
-        } else if (mouseButton == SECONDARY) {
 
-            if (counterList.contains(counter) && !hasShipsNear(i, j, yourBoard) && !hasFrozenHorizontalCells(i, j, delta)) {
-                probeCell.setModifable(true);
-            }
+                if (!probeCell.isWithShip() && probeCell.isModifable() && counter < 20 && checkVerticalShipPlaceConstraint(i, j, predI, predJ) && !probeCell.isFrozen()) {
+                    addCellWithShip(rectangle, i, j);
+                    if (counterOfDeck < numberOfDeckList.get(numberOfShipsOnBoard)) {
+                        if (i > 0 && i < 9) {
+                            if (!yourBoard.getIndexCell(i - 1, j).isFrozen()) {
+                                yourBoard.getIndexCell(i - 1, j).setModifable(true);
+                            }
+                            if (!yourBoard.getIndexCell(i + 1, j).isFrozen()) {
+                                yourBoard.getIndexCell(i + 1, j).setModifable(true);
+                            }
+                        }
+                        if (i == 0) {
+                            if (!yourBoard.getIndexCell(i + 1, j).isFrozen()) {
+                                yourBoard.getIndexCell(i + 1, j).setModifable(true);
+                            }
+                        }
+                        if (i == 9) {
+                            if (!yourBoard.getIndexCell(i - 1, j).isFrozen()) {
+                                yourBoard.getIndexCell(i - 1, j).setModifable(true);
+                            }
+                        }
+                    } else {
+                        afterOneShipPlace();
+                    }
+                }
+            } else if (mouseButton == SECONDARY) {
 
-            if (!probeCell.isWithShip() && probeCell.isModifable() && counter < 20 && checkHorizontalShipPlaceConstraint(i, j, predI, predJ) && !probeCell.isFrozen()) {
-                addCellWithShip(rectangle, i, j);
-                if (counterOfDeck < numberOfDeckList.get(numberOfShipsOnBoard)) {
-                    if (j > 0 && j < 9) {
-                        if (!yourBoard.getIndexCell(i, j - 1).isFrozen()) {
-                            yourBoard.getIndexCell(i, j - 1).setModifable(true);
+                if (counterList.contains(counter) && !hasShipsNear(i, j, yourBoard) && !hasFrozenHorizontalCells(i, j, delta)) {
+                    probeCell.setModifable(true);
+                }
+
+                if (!probeCell.isWithShip() && probeCell.isModifable() && counter < 20 && checkHorizontalShipPlaceConstraint(i, j, predI, predJ) && !probeCell.isFrozen()) {
+                    addCellWithShip(rectangle, i, j);
+                    if (counterOfDeck < numberOfDeckList.get(numberOfShipsOnBoard)) {
+                        if (j > 0 && j < 9) {
+                            if (!yourBoard.getIndexCell(i, j - 1).isFrozen()) {
+                                yourBoard.getIndexCell(i, j - 1).setModifable(true);
+                            }
+                            if (!yourBoard.getIndexCell(i, j + 1).isFrozen()) {
+                                yourBoard.getIndexCell(i, j + 1).setModifable(true);
+                            }
                         }
-                        if (!yourBoard.getIndexCell(i, j + 1).isFrozen()) {
-                            yourBoard.getIndexCell(i, j + 1).setModifable(true);
+                        if (j == 0) {
+                            if (!yourBoard.getIndexCell(i, j + 1).isFrozen()) {
+                                yourBoard.getIndexCell(i, j + 1).setModifable(true);
+                            }
                         }
+                        if (j == 9) {
+                            if (!yourBoard.getIndexCell(i, j - 1).isFrozen()) {
+                                yourBoard.getIndexCell(i, j - 1).setModifable(true);
+                            }
+                        }
+                    } else {
+                        afterOneShipPlace();
                     }
-                    if (j == 0) {
-                        if (!yourBoard.getIndexCell(i, j + 1).isFrozen()) {
-                            yourBoard.getIndexCell(i, j + 1).setModifable(true);
-                        }
-                    }
-                    if (j == 9) {
-                        if (!yourBoard.getIndexCell(i, j - 1).isFrozen()) {
-                            yourBoard.getIndexCell(i, j - 1).setModifable(true);
-                        }
-                    }
-                } else {
-                    afterOneShipPlace();
                 }
             }
         }
