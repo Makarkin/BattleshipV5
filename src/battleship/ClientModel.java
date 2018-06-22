@@ -7,7 +7,6 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Date;
-import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -71,7 +70,7 @@ public class ClientModel extends Thread {
                         Platform.runLater(() -> controller.getMainView().getGameMessage().setText("Game started. Enemy turn"));
                         timer = new Timer();
                         Countdown countdown = new Countdown();
-                        timer.scheduleAtFixedRate(countdown, 1000, 1000);
+                        timer.scheduleAtFixedRate(countdown, 1000, 10000);
                     } else if ("n".equals(element)) {
                         return;
                     } else if ("enemyResult".equals(element)) {
@@ -96,26 +95,6 @@ public class ClientModel extends Thread {
             e.printStackTrace();
         }
     }
-
-/*    private void acceptOrRejectPlayer(String[] response) throws IOException {
-        System.out.printf("Do you want to play with %s y/n", response[response.length - 1]);
-        System.out.println();
-        Scanner scanner = new Scanner(System.in);
-        String s = scanner.nextLine();
-        System.out.println(s);
-        if ("y".equals(s)) {
-            controller.setYourTurn(true);
-            opponentName = response[response.length - 1];
-            Platform.runLater(() -> controller.getMainView().getEnemyLabel().setText(opponentName));
-            Platform.runLater(() -> controller.getMainView().getGameMessage().setText("Game started. Your turn"));
-            timer = new Timer();
-            Countdown countdown = new Countdown();
-            timer.scheduleAtFixedRate(countdown, 1000, 1000);
-            outputStream.writeObject(new LongMessage("y " + opponentName + " " + yourName));
-        } else {
-            outputStream.writeObject(new LongMessage("n " + response[response.length - 1] + " " + yourName));
-        }
-    }*/
 
     private void showUser(String[] users) {
         Date date = new Date();
