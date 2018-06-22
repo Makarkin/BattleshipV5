@@ -28,7 +28,6 @@ public class ChooseUser extends Thread {
         countdown.start();
         try {
             countdown.join();
-            System.out.println(stringReader.getState());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

@@ -54,9 +54,24 @@ public class PoolRequestHandler extends Thread {
                     victoryMethod(requestBody);
                 } else if ("lose".equals(requestBody[0])) {
                     loseMethod(requestBody);
+                } else if ("loseTime".equals(requestBody[0])) {
+                    try {
+                        loseTimeMethod(requestBody);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
+    }
+
+    private void loseTimeMethod(String[] requestBody) throws IOException {
+        Server.getUserList().incrementClientLossesByName(requestBody[1]);
+        Server.getUserList().incrementClientWinsByName(requestBody[2]);
+        Server.getUserList().getUsers().get(requestBody[1]).setBusy(false);
+        Server.getUserList().getUsers().get(requestBody[2]).setBusy(false);
+        String responseTo = requestBody[2];
+        Server.getUserList().getUsers().get(responseTo).getThisObjectOutputStream().writeObject(new LongMessage("win"));
     }
 
     private void victoryMethod(String[] requestBody) {

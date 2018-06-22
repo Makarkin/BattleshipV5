@@ -13,7 +13,6 @@ import javafx.scene.shape.Rectangle;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 import static javafx.scene.input.MouseButton.PRIMARY;
@@ -98,7 +97,7 @@ public class Controller {
         if (enemySumOfDecks == 0) {
             Platform.runLater(() -> mainView.getGameMessage().setText("You win!"));
             clientModel.transferVictoryMessage();
-            mainView.getStartButton().setDisable(false);
+            Platform.exit();
         }
     }
 
@@ -119,7 +118,6 @@ public class Controller {
         yourSumOfDecks--;
         if (yourSumOfDecks == 0) {
             loseMethod();
-            mainView.getStartButton().setDisable(false);
         }
 
         Platform.runLater(() -> getMainView().getGameMessage().setText("Your turn"));
@@ -337,11 +335,13 @@ public class Controller {
     }
 
     private static void freezeCell(ArrayList<IndexVault> itShouldFrozen, Board yourBoard) {
-        IndexVault vaultFirst = itShouldFrozen.get(0);
-        IndexVault vaultLast = itShouldFrozen.get(itShouldFrozen.size() - 1);
+
         ArrayList<Integer> indexesI = new ArrayList<>();
-        indexesI.add(vaultFirst.getI());
-        indexesI.add(vaultLast.getI());
+        ArrayList<Integer> indexesJ = new ArrayList<>();
+        for (IndexVault element : itShouldFrozen) {
+            indexesI.add(element.getI());
+            indexesJ.add(element.getJ());
+        }
 
         indexesI.sort((i1, i2) -> {
             if (i1 > i2) {
@@ -352,10 +352,6 @@ public class Controller {
                 return 0;
             }
         });
-
-        ArrayList<Integer> indexesJ = new ArrayList<>();
-        indexesJ.add(vaultFirst.getJ());
-        indexesJ.add(vaultLast.getJ());
 
         indexesJ.sort((i1, i2) -> {
             if (i1 > i2) {
@@ -424,10 +420,34 @@ public class Controller {
     private void loseMethod() throws IOException {
         Platform.runLater(()-> mainView.getGameMessage().setText("You lose!"));
         clientModel.transferLoseMessage();
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Platform.exit();
     }
 
     void loseTimeMethod() throws IOException {
         Platform.runLater(()-> mainView.getGameMessage().setText("Time is ended! You lose!"));
-        clientModel.transferLoseMessage();
+        clientModel.transferLoseTimeMessage();
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Platform.exit();
+    }
+
+    public void timeVictoryMetod() {
+        Platform.runLater(()-> mainView.getGameMessage().setText("Enemy time is ended! You win!"));
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Platform.exit();
     }
 }

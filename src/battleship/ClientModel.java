@@ -86,6 +86,8 @@ public class ClientModel extends Thread {
                         acceptOrRejectPlayerThread.join();
                         printWriter.println("Consideration of the request from the player");
                         printWriter.println();
+                    } else if ("win".equals(element)) {
+                        timeVictoryMethod();
                     }
                 }
             }
@@ -94,6 +96,10 @@ public class ClientModel extends Thread {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private void timeVictoryMethod() {
+        controller.timeVictoryMetod();
     }
 
     private void showUser(String[] users) {
@@ -144,11 +150,16 @@ public class ClientModel extends Thread {
         outputStream.writeObject(new LongMessage("lose " + yourName));
     }
 
+    void transferLoseTimeMessage() throws IOException {
+        outputStream.writeObject(new LongMessage("loseTime " + yourName + " " + opponentName));
+    }
+
     void transferVictoryMessage() throws IOException {
         outputStream.writeObject(new LongMessage("victory " + yourName));
     }
 
     class Countdown extends TimerTask {
+
         @Override
         public void run() {
             if (timeInterval == 0) {
@@ -167,6 +178,7 @@ public class ClientModel extends Thread {
     }
 
     private class AcceptOrRejectPlayerThread extends Thread {
+
         private String[] response;
 
         AcceptOrRejectPlayerThread(String[] response) {
@@ -183,8 +195,6 @@ public class ClientModel extends Thread {
             countdown.start();
             try {
                 countdown.join();
-                System.out.println(ClientModel.getTempString());
-                System.out.println(stringReader.getState());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -196,7 +206,7 @@ public class ClientModel extends Thread {
                 Platform.runLater(() -> controller.getMainView().getGameMessage().setText("Game started. Your turn"));
                 timer = new Timer();
                 ClientModel.Countdown anotherCountdown = new ClientModel.Countdown();
-                timer.scheduleAtFixedRate(anotherCountdown, 1000, 1000);
+                timer.scheduleAtFixedRate(anotherCountdown, 1000, 10000);
                 try {
                     outputStream.writeObject(new LongMessage("y " + opponentName + " " + yourName));
                 } catch (IOException e) {
