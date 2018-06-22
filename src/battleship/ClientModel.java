@@ -19,10 +19,13 @@ public class ClientModel extends Thread {
     private String opponentName = null;
     private String yourName;
     private Timer timer;
-    private Timer enterTimer;
     private int timeInterval;
     private int counter;
-    private Scanner scanner;
+    private static volatile String tempString;
+
+    public static String getTempString() {
+        return tempString;
+    }
 
     ClientModel(Controller controller) throws IOException {
         InetAddress address = InetAddress.getByName(controller.getIntrServerAddress());
@@ -31,7 +34,11 @@ public class ClientModel extends Thread {
         this.yourName = controller.getMainView().getYouLabel().getText();
         this.timeInterval = 120;
         this.counter = 10;
-        scanner = new Scanner(System.in);
+        this.tempString = null;
+    }
+
+    public static void setTempString(String tempString) {
+        ClientModel.tempString = tempString;
     }
 
     @Override
@@ -74,7 +81,10 @@ public class ClientModel extends Thread {
                         printWriter.printf("Your fire on %s. %s", opponentName, acceptResultOfYourFire(response));
                         printWriter.println();
                     } else if ("Do".equals(element)) {
-                        acceptOrRejectPlayer(response, scanner);
+                        AcceptOrRejectPlayerThread acceptOrRejectPlayerThread = new AcceptOrRejectPlayerThread(response);
+                        /*acceptOrRejectPlayer(response);*/
+                        acceptOrRejectPlayerThread.start();
+                        acceptOrRejectPlayerThread.join();
                         printWriter.println("Consideration of the request from the player");
                         printWriter.println();
                     }
@@ -87,10 +97,12 @@ public class ClientModel extends Thread {
         }
     }
 
-    private void acceptOrRejectPlayer(String[] response, Scanner scanner) throws IOException {
+/*    private void acceptOrRejectPlayer(String[] response) throws IOException {
         System.out.printf("Do you want to play with %s y/n", response[response.length - 1]);
         System.out.println();
+        Scanner scanner = new Scanner(System.in);
         String s = scanner.nextLine();
+        System.out.println(s);
         if ("y".equals(s)) {
             controller.setYourTurn(true);
             opponentName = response[response.length - 1];
@@ -103,7 +115,7 @@ public class ClientModel extends Thread {
         } else {
             outputStream.writeObject(new LongMessage("n " + response[response.length - 1] + " " + yourName));
         }
-    }
+    }*/
 
     private void showUser(String[] users) {
         Date date = new Date();
@@ -158,7 +170,6 @@ public class ClientModel extends Thread {
     }
 
     class Countdown extends TimerTask {
-
         @Override
         public void run() {
             if (timeInterval == 0) {
@@ -176,21 +187,49 @@ public class ClientModel extends Thread {
         }
     }
 
-    class EnterNameCountdown extends TimerTask {
-        private ChooseUser chooseUser;
+    private class AcceptOrRejectPlayerThread extends Thread {
+        private String[] response;
 
-        EnterNameCountdown(ChooseUser chooseUser) {
-            this.chooseUser = chooseUser;
-            chooseUser.start();
+        AcceptOrRejectPlayerThread(String[] response) {
+            this.response = response;
         }
 
         @Override
         public void run() {
-            if (counter == 0) {
-                enterTimer.cancel();
+            System.out.printf("Do you want to play with %s y/n", response[response.length - 1]);
+            System.out.println();
+            EnterNameCountdown countdown = new EnterNameCountdown();
+            StringReader stringReader = new StringReader();
+            stringReader.start();
+            countdown.start();
+            try {
+                countdown.join();
+                System.out.println(ClientModel.getTempString());
+                System.out.println(stringReader.getState());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
 
-            counter--;
+            if ("y".equals(ClientModel.getTempString())) {
+                controller.setYourTurn(true);
+                opponentName = response[response.length - 1];
+                Platform.runLater(() -> controller.getMainView().getEnemyLabel().setText(opponentName));
+                Platform.runLater(() -> controller.getMainView().getGameMessage().setText("Game started. Your turn"));
+                timer = new Timer();
+                ClientModel.Countdown anotherCountdown = new ClientModel.Countdown();
+                timer.scheduleAtFixedRate(anotherCountdown, 1000, 1000);
+                try {
+                    outputStream.writeObject(new LongMessage("y " + opponentName + " " + yourName));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    outputStream.writeObject(new LongMessage("n " + response[response.length - 1] + " " + yourName));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

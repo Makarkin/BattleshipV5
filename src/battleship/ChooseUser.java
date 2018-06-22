@@ -11,6 +11,7 @@ public class ChooseUser extends Thread {
     private Controller controller;
     private ObjectOutputStream outputStream;
 
+
     ChooseUser(String[] users, Controller controller, ObjectOutputStream outputStream) {
         this.controller = controller;
         this.users = users;
@@ -21,14 +22,23 @@ public class ChooseUser extends Thread {
     public void run() {
         System.out.println("Choose number of your opponent. r - refresh list");
         int index;
-        Scanner scanner = new Scanner(System.in);
-        String s = scanner.nextLine();
+        EnterNameCountdown countdown = new EnterNameCountdown();
+        StringReader stringReader = new StringReader();
+        stringReader.start();
+        countdown.start();
+        try {
+            countdown.join();
+            System.out.println(stringReader.getState());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         String request;
-        if ("r".equals(s)) {
+        System.out.println(ClientModel.getTempString());
+        if ("r".equals(ClientModel.getTempString())) {
             return;
         } else {
-            index = Integer.valueOf(s);
-            System.out.println(users[index]);
+            System.out.println(ClientModel.getTempString());
+            index = Integer.valueOf(ClientModel.getTempString());
             String[] result = users[index].split(" ");
             if (!Boolean.valueOf(result[1])) {
                 request = "request " + result[0] + " " + controller.getMainView().getYouLabel().getText();
